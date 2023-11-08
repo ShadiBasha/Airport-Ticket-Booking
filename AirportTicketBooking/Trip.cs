@@ -23,14 +23,19 @@ public class Trip
         }
     }
 
-    public Trip(DateTime takeoffTime, TimeOnly duration, Plan tripPlan)
+    public required Airport Departure { get; set;}
+
+    public required Airport Arrival { get; set; }
+
+    public Trip(DateTime takeoffTime, TimeOnly duration, Plan tripPlan, Airport departure, Airport arrival)
     {
         Id = _id;
         TakeoffTime = takeoffTime;
         Duration = duration;
         TripPlan = tripPlan;
+        Departure = departure;
+        Arrival = arrival;
         _id++;
     }
-
-
+    
 }
