@@ -1,6 +1,6 @@
 ﻿namespace AirportTicketBooking;
 
-public interface IFileReader<T>
+public interface IFileReader
 {
-    public List<T> ReadFile(string path);
+    public bool ReadFile();
 }
