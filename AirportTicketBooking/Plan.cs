@@ -45,18 +45,8 @@ public class Plan
             _firstClassCapacity = 0;
         } 
     }
-
-    Plan()
-    {
-        Id = _id;
-        Name = Id.ToString();
-        EconomyCapacity = 0;
-        BusinessCapacity = 0;
-        FirstClassCapacity = 0;
-        _id++;
-    }
-
-    Plan(string name, int economyCapacity, int businessCapacity, int firstClassCapacity)
+    
+    public Plan(string name, int economyCapacity = 0, int businessCapacity = 0, int firstClassCapacity = 0)
     {
         Id = _id;
         Name = name;
@@ -65,6 +55,5 @@ public class Plan
         FirstClassCapacity = firstClassCapacity;
         _id++;
     }
-
-
+    
 }
