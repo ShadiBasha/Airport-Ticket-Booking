@@ -57,5 +57,16 @@ public class PlanDetails : Plan
         FirstClassCapacity = firstClassCapacity;
         IdGenerator++;
     }
-    
+
+    public override string ToString()
+    {
+        return $"""
+                Plan {Id}
+                Plan Name : {Name}
+                Capacity 
+                Economy     : {EconomyCapacity}
+                Business    : {BusinessCapacity}
+                First class : {FirstClassCapacity}
+                """;
+    }
 }

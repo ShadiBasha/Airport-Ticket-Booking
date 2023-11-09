@@ -9,7 +9,7 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
 {
     private static PlanStorage? _planStorage = null;
     private string _path;
-    private List<PlanDetails> _plansData;
+    private List<PlanDetails> _plansDetailsList;
     public bool SaveDataBeforeClosing {
         get;
         set;
@@ -18,12 +18,12 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
     private PlanStorage(string path)
     {
         _path = path;
-        _plansData = new List<PlanDetails>();
+        _plansDetailsList = new List<PlanDetails>();
     }
 
     public bool AddPlan(PlanDetails planDetails)
     {
-        _plansData.Add(planDetails);
+        _plansDetailsList.Add(planDetails);
         return true;
     }
 
@@ -43,8 +43,8 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
         if (File.Exists(_path))
         {
             string data = File.ReadAllText(_path);
-            _plansData = data.FromCsv<List<PlanDetails>>();
-            Plan.IdGenerator = _plansData[^1].Id + 1;
+            _plansDetailsList = data.FromCsv<List<PlanDetails>>();
+            Plan.IdGenerator = _plansDetailsList[^1].Id + 1;
             return true;
         }
         return false;
@@ -56,7 +56,7 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
         {
             _path = "PlanData.csv";
         }
-        File.WriteAllText(_path,_plansData.ToCsv());
+        File.WriteAllText(_path,_plansDetailsList.ToCsv());
         return true;
     }
 
@@ -66,5 +66,19 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
         {
             WriteInFile();
         }
+    }
+
+    public override string ToString()
+    {
+        string data ="****************************";
+        foreach (var planDetails in _plansDetailsList)
+        {
+            data += $"""
+                    
+                    {planDetails}
+                    ****************************   
+                    """;
+        }
+        return data;
     }
 }
