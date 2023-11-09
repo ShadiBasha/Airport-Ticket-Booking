@@ -6,7 +6,7 @@ public class Trip
     public int Id { get; init; }
     private DateTime _takeoffTime;
     public required TimeOnly Duration { get; set; }
-    public required Plan TripPlan { get; set; }
+    public required PlanDetails TripPlanDetails { get; set; }
     public required DateTime TakeoffTime
     {
         get => _takeoffTime;
@@ -27,12 +27,12 @@ public class Trip
 
     public required Airport Arrival { get; set; }
 
-    public Trip(DateTime takeoffTime, TimeOnly duration, Plan tripPlan, Airport departure, Airport arrival)
+    public Trip(DateTime takeoffTime, TimeOnly duration, PlanDetails tripPlanDetails, Airport departure, Airport arrival)
     {
         Id = _id;
         TakeoffTime = takeoffTime;
         Duration = duration;
-        TripPlan = tripPlan;
+        TripPlanDetails = tripPlanDetails;
         Departure = departure;
         Arrival = arrival;
         _id++;

@@ -1,6 +1,6 @@
 ﻿namespace AirportTicketBooking;
 
-public class Plan
+public abstract class Plan
 {
-    
+    protected static int IdGenerator;
 }

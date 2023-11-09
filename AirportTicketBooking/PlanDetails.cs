@@ -1,8 +1,7 @@
 ﻿namespace AirportTicketBooking;
 
-public class PlanDetials
+public class PlanDetails : Plan
 {
-    public static int IdGenerator; 
     public int Id { get; init; }
     public string Name { get; set; }
     private int _economyCapacity;
@@ -49,7 +48,7 @@ public class PlanDetials
         } 
     }
     
-    public PlanDetials(string name, int economyCapacity = 0, int businessCapacity = 0, int firstClassCapacity = 0)
+    public PlanDetails(string name, int economyCapacity = 0, int businessCapacity = 0, int firstClassCapacity = 0)
     {
         Id = IdGenerator;
         Name = name;

@@ -5,11 +5,11 @@ using ServiceStack;
 
 namespace AirportTicketBooking;
 
-public class PlanStorage : IFileReader, IFileWriter
+public class PlanStorage : Plan, IFileReader, IFileWriter
 {
     private static PlanStorage? _planStorage = null;
     private string _path;
-    private List<Plan> _plansData;
+    private List<PlanDetails> _plansData;
     public bool SaveDataBeforeClosing {
         get;
         set;
@@ -18,12 +18,12 @@ public class PlanStorage : IFileReader, IFileWriter
     private PlanStorage(string path)
     {
         _path = path;
-        _plansData = new List<Plan>();
+        _plansData = new List<PlanDetails>();
     }
 
-    public bool AddPlan(Plan plan)
+    public bool AddPlan(PlanDetails planDetails)
     {
-        _plansData.Add(plan);
+        _plansData.Add(planDetails);
         return true;
     }
 
@@ -43,7 +43,7 @@ public class PlanStorage : IFileReader, IFileWriter
         if (File.Exists(_path))
         {
             string data = File.ReadAllText(_path);
-            _plansData = data.FromCsv<List<Plan>>();
+            _plansData = data.FromCsv<List<PlanDetails>>();
             Plan.IdGenerator = _plansData[^1].Id + 1;
             return true;
         }
