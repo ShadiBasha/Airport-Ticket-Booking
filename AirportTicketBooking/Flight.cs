@@ -11,4 +11,10 @@ public class Flight
         _trips = trips;
         _id++;
     }
+
+    public bool addTrip(Trip trip)
+    {
+        _trips.Add(trip);
+        return true;
+    }
 }
