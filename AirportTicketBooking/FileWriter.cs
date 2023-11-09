@@ -1,6 +1,6 @@
 ﻿namespace AirportTicketBooking;
 
-public interface IFileWriter<T>
+public interface IFileWriter
 {
-    public bool WriteInFile(List<T> data);
+    public bool WriteInFile();
 }
