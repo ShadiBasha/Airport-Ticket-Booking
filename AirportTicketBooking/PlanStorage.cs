@@ -9,7 +9,7 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
 {
     private static PlanStorage? _planStorage = null;
     private string _path;
-    private List<PlanDetails> _plansDetailsList;
+    private Dictionary<int,PlanDetails> _plansDetailsMap;
     public bool SaveDataBeforeClosing {
         get;
         set;
@@ -18,12 +18,12 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
     private PlanStorage(string path)
     {
         _path = path;
-        _plansDetailsList = new List<PlanDetails>();
+        _plansDetailsMap = new Dictionary<int, PlanDetails>();
     }
 
     public bool AddPlan(PlanDetails planDetails)
     {
-        _plansDetailsList.Add(planDetails);
+        _plansDetailsMap.Add(planDetails.Id,planDetails);
         return true;
     }
 
@@ -43,8 +43,9 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
         if (File.Exists(_path))
         {
             string data = File.ReadAllText(_path);
-            _plansDetailsList = data.FromCsv<List<PlanDetails>>();
-            Plan.IdGenerator = _plansDetailsList[^1].Id + 1;
+            List<PlanDetails> planDetailsList = data.FromCsv<List<PlanDetails>>();
+            Plan.IdGenerator = planDetailsList[^1].Id + 1;
+            _plansDetailsMap = planDetailsList.Select(plan => new { plan.Id, plan }).ToDictionary(x => x.Id,x=> x.plan);
             return true;
         }
         return false;
@@ -56,7 +57,9 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
         {
             _path = "PlanData.csv";
         }
-        File.WriteAllText(_path,_plansDetailsList.ToCsv());
+
+        List<PlanDetails> plansDetails = _plansDetailsMap.Values.ToList();
+        File.WriteAllText(_path,plansDetails.ToCsv());
         return true;
     }
 
@@ -71,11 +74,11 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
     public override string ToString()
     {
         string data ="****************************";
-        foreach (var planDetails in _plansDetailsList)
+        foreach (var planDetails in _plansDetailsMap)
         {
             data += $"""
                     
-                    {planDetails}
+                    {planDetails.Value}
                     ****************************   
                     """;
         }
