@@ -69,6 +69,8 @@ public class FlightStorage : Flight
         }
         FlightStorage flightStorage = GetStorageInstance();
         flightStorage.ReadFile();
+        PlanStorage planStorage = PlanStorage.GetStorageInstance();
+        planStorage.ReadFile();
         var newFlights = new List<FlightDetails>();
         var reader = File.OpenRead(path);
         var lines = reader.ReadLines();
@@ -91,10 +93,14 @@ public class FlightStorage : Flight
             try
             {
                 planId = int.Parse(fields[0]);
-                //find plan if it exists.
+                if (!planStorage.FindPlan(planId))
+                {
+                    throw new Exception("Error: plan does not exist");
+                }
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.Message);
                 throw new Exception($"Error in Line {index}: Make sure the value is integer in the plan id field");
             }
 
