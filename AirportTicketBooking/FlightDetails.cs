@@ -38,10 +38,13 @@ public class FlightDetails : Flight
 
     public override string ToString()
     {
+        AirportStorage airportStorage = AirportStorage.GetStorageInstance();
+        airportStorage.ReadFile();
+        var airportDetails = airportStorage.getAirports();
         return $"""
                 Flight {Id}
                 Plan Id : {PlanId}
-                Departure Airport : {DepartureAirportId} --> Arrival Airport : {ArrivalAirportId}
+                Departure Airport : {airportDetails[DepartureAirportId].Name} --> Arrival Airport : {airportDetails[ArrivalAirportId].Name}
                 Takeoff Date : {TakeoffTime}
                 Duration : {Duration.Hour}:{Duration.Minute.ToString().PadLeft(2,'0')}
                 """;

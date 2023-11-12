@@ -6,9 +6,9 @@ class Program
 {
     public static int Main()
     {
-        var ais = AirportStorage.GetStorageInstance();
-        ais.ReadFile();
-        Console.WriteLine(ais);
+        FlightStorage fs = FlightStorage.GetStorageInstance();
+        fs.ReadFile();
+        Console.WriteLine(fs);
         return 0;
     }
 }

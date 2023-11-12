@@ -33,11 +33,15 @@ public class AirportStorage : Airport, IFileWriter, IFileReader
         return false;
     }
 
+    public Dictionary<int, AirportDetails> getAirports()
+    {
+        return _airportsDetailsMap;
+    }
+
     public static AirportStorage GetStorageInstance(string path = "AirportData.csv")
     {
         if (_airportStorage == null)
         {
-            
             _airportStorage = new AirportStorage(path);
         }
         

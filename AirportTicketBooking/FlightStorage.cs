@@ -71,6 +71,8 @@ public class FlightStorage : Flight, IFileReader, IFileWriter
         flightStorage.ReadFile();
         PlanStorage planStorage = PlanStorage.GetStorageInstance();
         planStorage.ReadFile();
+        AirportStorage airportStorage = AirportStorage.GetStorageInstance();
+        airportStorage.ReadFile();
         var newFlights = new List<FlightDetails>();
         var reader = File.OpenRead(path);
         var lines = reader.ReadLines();
@@ -107,20 +109,28 @@ public class FlightStorage : Flight, IFileReader, IFileWriter
             try
             {
                 departureAirportId = int.Parse(fields[1]);
-                //find airport if it exists.
+                if (!airportStorage.FindAirport(departureAirportId))
+                {
+                    throw new Exception("Error: Airport does not exist");
+                }
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.Message);
                 throw new Exception($"Error in Line {index}: Make sure the value is integer in the departure airport field");
             }
 
             try
             {
                 arrivalAirportId = int.Parse(fields[2]);
-                //find airport if it exists
+                if (!airportStorage.FindAirport(arrivalAirportId))
+                {
+                    throw new Exception("Error: Airport does not exist");
+                }
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.Message);
                 throw new Exception($"Error in Line {index}: Make sure the value is integer in the arrival airport field");
             }
             
