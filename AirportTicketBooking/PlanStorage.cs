@@ -21,13 +21,13 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
         _plansDetailsMap = new Dictionary<int, PlanDetails>();
     }
 
-    public bool AddPlan(PlanDetails planDetails)
+    public bool Add(PlanDetails planDetails)
     {
         _plansDetailsMap.Add(planDetails.Id,planDetails);
         return true;
     }
 
-    public static PlanStorage GetStorageInstanse(string path = "PlanData.csv")
+    public static PlanStorage GetStorageInstance(string path = "PlanData.csv")
     {
         if (_planStorage == null)
         {

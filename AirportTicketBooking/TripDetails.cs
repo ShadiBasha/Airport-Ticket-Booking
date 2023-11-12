@@ -24,9 +24,9 @@ public class TripDetails : Trip
         }
     }
 
-    public required Airport Departure { get; set;}
+    // public required Airport Departure { get; set;}
 
-    public required Airport Arrival { get; set; }
+    // public required Airport Arrival { get; set; }
 
     [SetsRequiredMembers]
     public TripDetails(DateTime takeoffTime, TimeOnly duration, PlanDetails tripPlanDetails, Airport departure, Airport arrival)
@@ -35,8 +35,8 @@ public class TripDetails : Trip
         TakeoffTime = takeoffTime;
         Duration = duration;
         TripPlanDetails = tripPlanDetails;
-        Departure = departure;
-        Arrival = arrival;
+        // Departure = departure;
+        // Arrival = arrival;
         IdGenerator++;
     }
     
