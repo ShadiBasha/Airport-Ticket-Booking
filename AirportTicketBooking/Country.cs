@@ -6,4 +6,11 @@ public enum Country
     Germany,
     Japan,
     Brazil,
+    USA,
+    UAE,
+    UK,
+    China,
+    Singapore,
+    Jordan,
+    Australia
 }

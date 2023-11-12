@@ -6,10 +6,9 @@ class Program
 {
     public static int Main()
     {
-        FlightStorage f = FlightStorage.GetStorageInstance();
-        f.WriteFromAUserFile(@"C:\Users\Shadi Basha\Desktop\Shadi.csv");
-        f.ReadFile();
-        Console.WriteLine(f);
+        var ais = AirportStorage.GetStorageInstance();
+        ais.ReadFile();
+        Console.WriteLine(ais);
         return 0;
     }
 }

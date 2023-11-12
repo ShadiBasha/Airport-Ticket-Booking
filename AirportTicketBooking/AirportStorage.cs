@@ -63,7 +63,7 @@ public class AirportStorage : Airport, IFileWriter, IFileReader
     {
         if (!File.Exists(_path))
         {
-            _path = "PlanData.csv";
+            _path = "AirportData.csv";
         }
 
         List<AirportDetails> airportsDetails = _airportsDetailsMap.Values.ToList();
