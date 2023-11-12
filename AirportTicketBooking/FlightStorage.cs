@@ -21,6 +21,12 @@ public class FlightStorage : Flight
         _flightsDetailsMap.Add(flightDetails.Id,flightDetails);
         return true;
     }
+
+    public Dictionary<int, FlightDetails> GetFlights()
+    {
+        return _flightsDetailsMap;
+    }
+
     public static FlightStorage GetStorageInstance(string path = "FlightData.csv")
     {
         if (_flightStorage == null)
