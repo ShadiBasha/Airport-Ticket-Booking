@@ -6,7 +6,7 @@ public class FlightStorage : Flight
 {
     private static FlightStorage? _flightStorage = null;
     private string _path;
-    public Dictionary<int,FlightDetails> _flightsDetailsMap;
+    private Dictionary<int,FlightDetails> _flightsDetailsMap;
     public bool SaveDataBeforeClosing {
         get;
         set;
