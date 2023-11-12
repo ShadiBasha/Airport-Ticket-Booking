@@ -23,18 +23,18 @@ public static class FlightFilter
             .ToDictionary(flight => flight.Key, flight => flight.Value);
     }   
     
-   public static Dictionary<int,FlightDetails> FilterByDepartureAirport(Dictionary<int, FlightDetails> flightStorage,Airport departureAirport)
-    {
-        return flightStorage
-            .Where(flight => flight.Value.DepartureAirportId >= departureAirport)
-            .ToDictionary(flight => flight.Key, flight => flight.Value);
-    }   
-
-   public static Dictionary<int,FlightDetails> FilterByArrivalAirport(Dictionary<int, FlightDetails> flightStorage,Airport arrivalAirport)
-   {
-       return flightStorage
-           .Where(flight => flight.Value.ArrivalAirportId >= arrivalAirport)
-           .ToDictionary(flight => flight.Key, flight => flight.Value);
-   }
+   // public static Dictionary<int,FlightDetails> FilterByDepartureAirport(Dictionary<int, FlightDetails> flightStorage,Airport departureAirport)
+   //  {
+   //      return flightStorage
+   //          .Where(flight => flight.Value.DepartureAirportId >= departureAirport)
+   //          .ToDictionary(flight => flight.Key, flight => flight.Value);
+   //  }   
+   //
+   // public static Dictionary<int,FlightDetails> FilterByArrivalAirport(Dictionary<int, FlightDetails> flightStorage,Airport arrivalAirport)
+   // {
+   //     return flightStorage
+   //         .Where(flight => flight.Value.ArrivalAirportId >= arrivalAirport)
+   //         .ToDictionary(flight => flight.Key, flight => flight.Value);
+   // }
    
 }

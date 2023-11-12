@@ -29,7 +29,7 @@ public class TripDetails : Trip
     // public required Airport Arrival { get; set; }
 
     [SetsRequiredMembers]
-    public TripDetails(DateTime takeoffTime, TimeOnly duration, PlanDetails tripPlanDetails, Airport departure, Airport arrival)
+    public TripDetails(DateTime takeoffTime, TimeOnly duration, PlanDetails tripPlanDetails, AirportDetails departure, AirportDetails arrival)
     {
         Id = IdGenerator;
         TakeoffTime = takeoffTime;

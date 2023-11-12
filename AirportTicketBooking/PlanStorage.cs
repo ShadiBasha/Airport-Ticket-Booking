@@ -54,7 +54,9 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
             string data = File.ReadAllText(_path);
             List<PlanDetails> planDetailsList = data.FromCsv<List<PlanDetails>>();
             Plan.IdGenerator = planDetailsList[^1].Id + 1;
-            _plansDetailsMap = planDetailsList.Select(plan => new { plan.Id, plan }).ToDictionary(x => x.Id,x=> x.plan);
+            _plansDetailsMap = planDetailsList
+                .Select(plan => new { plan.Id, plan })
+                .ToDictionary(x => x.Id,x=> x.plan);
             return true;
         }
         return false;

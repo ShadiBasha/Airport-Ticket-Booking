@@ -2,7 +2,7 @@
 
 namespace AirportTicketBooking;
 
-public class FlightStorage : Flight
+public class FlightStorage : Flight, IFileReader, IFileWriter
 {
     private static FlightStorage? _flightStorage = null;
     private string _path;
@@ -147,7 +147,7 @@ public class FlightStorage : Flight
                 throw new Exception($"Error in Line {index}: Make sure the value is a positive time in the duration field");
             }
             FlightDetails newFlightDetails =
-                new FlightDetails(takeoffTime, planId, duration, (Airport)departureAirportId, (Airport)arrivalAirportId);
+                new FlightDetails(takeoffTime, planId, duration, departureAirportId, arrivalAirportId);
             newFlights.Add(newFlightDetails);
         }
         

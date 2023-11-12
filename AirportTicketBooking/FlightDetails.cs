@@ -22,10 +22,10 @@ public class FlightDetails : Flight
             }
         }
     }
-    public Airport DepartureAirportId { get; set;}
-    public Airport ArrivalAirportId { get; set; }
+    public int DepartureAirportId { get; set;}
+    public int ArrivalAirportId { get; set; }
     
-    public FlightDetails(DateTime takeoffTime, int planId, TimeOnly duration, Airport departureAirportId, Airport arrivalAirportId)
+    public FlightDetails(DateTime takeoffTime, int planId, TimeOnly duration, int departureAirportId, int arrivalAirportId)
     {
         _takeoffTime = takeoffTime;
         Id = IdGenerator;
