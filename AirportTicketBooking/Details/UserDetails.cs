@@ -25,6 +25,34 @@ public class UserDetails : IIndexed
 
         Bookings.Add(Tuple.Create(flightId, classType));
     }
+
+    public void ModifyBooking(int flightId, Classes newClass)
+    {
+        if (Bookings.Any(booking => booking.Item1 == flightId))
+        {
+            var newBookings = Bookings
+                .Select(booking => booking.Item1 == flightId ? Tuple.Create(flightId, newClass) : booking).ToList();
+            Bookings = newBookings;
+        }
+        else
+        {
+            throw new Exception("Error: Your didn't book this flight");
+        }
+    }
+    
+    public void CancelBooking(int flightId)
+    {
+        if (Bookings.Any(booking => booking.Item1 == flightId))
+        {
+            var newBookings = Bookings.Where(booking => booking.Item1 != flightId).ToList();
+            Bookings = newBookings;
+        }
+        else
+        {
+            throw new Exception("Error: Can't Cancel a booking that your not registered to");
+        }
+    }
+
     public override string ToString()
     {
         FlightStorage flightStorage = FlightStorage.GetStorageInstance();
