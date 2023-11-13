@@ -41,11 +41,8 @@ public class FlightStorage : Storage<FlightDetails>
             throw new Exception("Error: Can't access the file Check the file path and try again");
         }
         FlightStorage flightStorage = GetStorageInstance();
-        flightStorage.ReadFile();
         PlanStorage planStorage = PlanStorage.GetStorageInstance();
-        planStorage.ReadFile();
         AirportStorage airportStorage = AirportStorage.GetStorageInstance();
-        airportStorage.ReadFile();
         var newFlights = new List<FlightDetails>();
         var reader = File.OpenRead(path);
         var lines = reader.ReadLines();
