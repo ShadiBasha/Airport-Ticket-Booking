@@ -95,7 +95,7 @@ public class FlightStorage : Flight, IFileReader, IFileWriter
             try
             {
                 planId = int.Parse(fields[0]);
-                if (!planStorage.FindPlan(planId))
+                if (planStorage.FindPlan(planId) == null)
                 {
                     throw new Exception("Error: plan does not exist");
                 }

@@ -27,13 +27,9 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
         return true;
     }
 
-    public bool FindPlan(int id)
+    public PlanDetails? FindPlan(int id)
     {
-        if (_plansDetailsMap.ContainsKey(id))
-        {
-            return true;
-        }
-        return false;
+        return _plansDetailsMap.TryGetValue(id, out var plan) ? plan : null;
     }
 
     public static PlanStorage GetStorageInstance(string path = "PlanData.csv")

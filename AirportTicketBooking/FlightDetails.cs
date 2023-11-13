@@ -36,17 +36,33 @@ public class FlightDetails : Flight
         IdGenerator++;
     }
 
+    private Tuple<int, int, int> ComputePrices()
+    {
+        PlanStorage planStorage = PlanStorage.GetStorageInstance();
+        planStorage.ReadFile();
+        var plan = planStorage.FindPlan(PlanId);
+        int economyPrice = plan.EconomyPrice * Duration.Hour * 2 + plan.EconomyPrice * (Duration.Minute / 30);
+        int businessPrice = plan.BusinessPrice * Duration.Hour * 2 + plan.BusinessPrice * (Duration.Minute / 30);
+        int firstClassPrice = plan.FirstClassPrice * Duration.Hour * 2 + plan.FirstClassPrice * (Duration.Minute / 30);
+        return Tuple.Create(economyPrice, businessPrice, firstClassPrice);
+    }
+
     public override string ToString()
     {
         AirportStorage airportStorage = AirportStorage.GetStorageInstance();
         airportStorage.ReadFile();
         var airportDetails = airportStorage.getAirports();
+        Tuple<int, int, int> prices = ComputePrices();
         return $"""
                 Flight {Id}
                 Plan Id : {PlanId}
                 Departure Airport : {airportDetails[DepartureAirportId].Name} --> Arrival Airport : {airportDetails[ArrivalAirportId].Name}
                 Takeoff Date : {TakeoffTime}
                 Duration : {Duration.Hour}:{Duration.Minute.ToString().PadLeft(2,'0')}
+                Price
+                Economy     : {prices.Item1}$ 
+                Business    : {prices.Item2}$
+                First Class : {prices.Item3}$
                 """;
     }
     // public bool addTrip(TripDetails tripDetails)

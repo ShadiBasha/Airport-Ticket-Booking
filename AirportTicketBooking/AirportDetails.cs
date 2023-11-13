@@ -2,28 +2,6 @@
 
 namespace AirportTicketBooking;
 
-// public enum Airport
-// {
-//     HartsfieldJacksonAtlantaInternational,
-//     BeijingCapitalInternational,
-//     LondonHeathrow,
-//     DubaiInternational,
-//     LosAngelesInternational,
-//     TokyoHaneda,
-//     OHareInternational,
-//     FrankfurtAirport,
-//     SingaporeChangi,
-//     SydneyKingsfordSmith,
-//     QueenAliaInternational,
-//     KingHusseinInternational,
-//     MarkaInternational,
-//     GuarulhosGovernadorAndreFrancoMontoroInternational,
-//     GaleaoAntonioCarlosJobimInternational,
-//     BrasiliaPresidenteJuscelinoKubitschekInternational,
-//     TancredoNevesConfinsInternational,
-//     SantosDumont
-// }
-
 public class AirportDetails : Airport
 {
     public int Id { get; init; }

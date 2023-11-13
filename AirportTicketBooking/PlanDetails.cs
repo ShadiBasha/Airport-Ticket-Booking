@@ -7,6 +7,9 @@ public class PlanDetails : Plan
     private int _economyCapacity;
     private int _businessCapacity;
     private int _firstClassCapacity;
+    private int _economyPrice;
+    private int _businessPrice;
+    private int _firstClassPrice;
 
     public int EconomyCapacity
     {
@@ -47,14 +50,72 @@ public class PlanDetails : Plan
                 _firstClassCapacity = 0;
         } 
     }
+
+    public int EconomyPrice
+    {
+        get => _economyPrice;
+        set
+        {
+            if (value > 0)
+            {
+                _economyPrice = value;
+            }
+            else
+                _economyPrice = 0;
+        }
+    }
+    public int BusinessPrice
+    {
+        get => _businessPrice;
+        set
+        {
+            if (value > 0)
+            {
+                _businessPrice = value;
+            }
+            else
+                _businessPrice = 0;
+        }
+    }
+    public int FirstClassPrice
+    {
+        get => _firstClassPrice;
+        set
+        {
+            if (value > 0)
+            {
+                _firstClassPrice = value;
+            }
+            else 
+                _firstClassPrice = 0;
+        } 
+    }
     
-    public PlanDetails(string name, int economyCapacity = 0, int businessCapacity = 0, int firstClassCapacity = 0)
+    public PlanDetails(string name,Tuple<int, int> economy, Tuple<int, int> business, Tuple<int, int> firstClass)
     {
         Id = IdGenerator;
         Name = name;
+        EconomyCapacity = economy.Item1;
+        BusinessCapacity = business.Item1;
+        FirstClassCapacity = firstClass.Item1;
+        EconomyPrice = economy.Item2;
+        BusinessPrice = business.Item2;
+        FirstClassPrice = business.Item2;
+        
+        IdGenerator++;
+    }
+
+    public PlanDetails(string name,int economyCapacity, int businessCapacity, int firstClassCapacity, int economyPrice, int businessPrice, int firstClassPrice)
+    {
+        Id = IdGenerator;
         EconomyCapacity = economyCapacity;
         BusinessCapacity = businessCapacity;
         FirstClassCapacity = firstClassCapacity;
+        EconomyPrice = economyPrice;
+        BusinessPrice = businessPrice;
+        FirstClassPrice = firstClassPrice;
+        Name = name;
+
         IdGenerator++;
     }
 
@@ -67,6 +128,10 @@ public class PlanDetails : Plan
                 Economy     : {EconomyCapacity}
                 Business    : {BusinessCapacity}
                 First class : {FirstClassCapacity}
+                Prices per 30 minutes 
+                Economy     : {EconomyPrice}
+                Business    : {BusinessPrice}
+                First class : {FirstClassPrice}
                 """;
     }
 }
