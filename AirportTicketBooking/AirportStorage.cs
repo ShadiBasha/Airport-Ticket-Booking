@@ -53,18 +53,4 @@ public class AirportStorage : Storage<AirportDetails>
             WriteInFile();
         }
     }
-
-    public override string ToString()
-    {
-        string data ="****************************";
-        foreach (var airportsDetails in _dataDetailsMap)
-        {
-            data += $"""
-                    
-                    {airportsDetails.Value}
-                    ****************************   
-                    """;
-        }
-        return data;
-    }
 }

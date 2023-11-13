@@ -1,4 +1,5 @@
-﻿using ServiceStack;
+﻿using System.Data.Common;
+using ServiceStack;
 
 namespace AirportTicketBooking;
 
@@ -46,5 +47,18 @@ public abstract class Storage<T> : IFileReader, IFileWriter where T : IIndexed
         }
         WriteInFile();
     }
-    public abstract override string ToString();
+    
+    public override string ToString()
+    {
+        string data ="****************************";
+        foreach (var details in _dataDetailsMap)
+        {
+            data += $"""
+
+                     {details.Value}
+                     ****************************
+                     """;
+        }
+        return data;
+    }   
 }

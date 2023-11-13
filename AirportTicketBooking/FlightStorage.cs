@@ -158,18 +158,4 @@ public class FlightStorage : Storage<FlightDetails>
             IdGenerator = 0;
         }
     }
-
-    public override string ToString()
-    {
-        string data ="****************************";
-        foreach (var flight in _dataDetailsMap)
-        {
-            data += $"""
-
-                     {flight.Value}
-                     ****************************
-                     """;
-        }
-        return data;
-    }
 }

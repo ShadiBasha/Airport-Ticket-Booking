@@ -57,18 +57,4 @@ public class PlanStorage : Storage<PlanDetails>
             WriteInFile();
         }
     }
-
-    public override string ToString()
-    {
-        string data ="****************************";
-        foreach (var planDetails in _dataDetailsMap)
-        {
-            data += $"""
-                    
-                    {planDetails.Value}
-                    ****************************   
-                    """;
-        }
-        return data;
-    }
 }
