@@ -1,6 +1,6 @@
 ﻿namespace AirportTicketBooking;
 
-public class PlanDetails : Plan
+public class PlanDetails : IIndexed
 {
     public int Id { get; init; }
     public string Name { get; set; }
@@ -91,9 +91,9 @@ public class PlanDetails : Plan
         } 
     }
     
-    public PlanDetails(string name,Tuple<int, int> economy, Tuple<int, int> business, Tuple<int, int> firstClass)
+    public PlanDetails(int id,string name,Tuple<int, int> economy, Tuple<int, int> business, Tuple<int, int> firstClass)
     {
-        Id = IdGenerator;
+        Id = id;
         Name = name;
         EconomyCapacity = economy.Item1;
         BusinessCapacity = business.Item1;
@@ -101,13 +101,11 @@ public class PlanDetails : Plan
         EconomyPrice = economy.Item2;
         BusinessPrice = business.Item2;
         FirstClassPrice = business.Item2;
-        
-        IdGenerator++;
     }
 
-    public PlanDetails(string name,int economyCapacity, int businessCapacity, int firstClassCapacity, int economyPrice, int businessPrice, int firstClassPrice)
+    public PlanDetails(int id, string name,int economyCapacity, int businessCapacity, int firstClassCapacity, int economyPrice, int businessPrice, int firstClassPrice)
     {
-        Id = IdGenerator;
+        Id = id;
         EconomyCapacity = economyCapacity;
         BusinessCapacity = businessCapacity;
         FirstClassCapacity = firstClassCapacity;
@@ -115,8 +113,6 @@ public class PlanDetails : Plan
         BusinessPrice = businessPrice;
         FirstClassPrice = firstClassPrice;
         Name = name;
-
-        IdGenerator++;
     }
 
     public override string ToString()
@@ -129,9 +125,9 @@ public class PlanDetails : Plan
                 Business    : {BusinessCapacity}
                 First class : {FirstClassCapacity}
                 Prices per 30 minutes 
-                Economy     : {EconomyPrice}
-                Business    : {BusinessPrice}
-                First class : {FirstClassPrice}
+                Economy     : {EconomyPrice}$
+                Business    : {BusinessPrice}$
+                First class : {FirstClassPrice}$
                 """;
     }
 }

@@ -2,5 +2,5 @@
 
 public interface IFileWriter
 {
-    public bool WriteInFile();
+    public void WriteInFile();
 }

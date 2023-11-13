@@ -2,13 +2,11 @@
 
 namespace AirportTicketBooking;
 
-public abstract class Storage<T> where T : IIndexed
+public abstract class Storage<T> : IFileReader, IFileWriter where T : IIndexed
 {
-    protected Storage<T>? _storage;
     protected string _path;
     protected string _defaultPath;
     protected Dictionary<int,T> _dataDetailsMap;
-    
     public bool SaveDataBeforeClosing {
         get;
         set;
@@ -17,7 +15,7 @@ public abstract class Storage<T> where T : IIndexed
     {
         _dataDetailsMap.Add(dataDetails.Id,dataDetails); 
     }
-    public void DeletData(int id)
+    public void DeleteData(int id)
     {
         _dataDetailsMap.Remove(id);
     }
@@ -25,8 +23,7 @@ public abstract class Storage<T> where T : IIndexed
     {
         return _dataDetailsMap;
     }
-    public abstract T GetStorageInstance(string path);
-    public bool WriteInFile()
+    public void WriteInFile()
     {
         if (!File.Exists(_path))
         {
@@ -34,10 +31,9 @@ public abstract class Storage<T> where T : IIndexed
         }
         List<T> dataDetails = _dataDetailsMap.Values.ToList();
         File.WriteAllText(_path,dataDetails.ToCsv());
-        return true;
     }
     protected abstract void SetGenerator(List<T> detailsList);
-    public bool ReadFile()
+    public void ReadFile()
     {
         if (File.Exists(_path))
         {
@@ -46,9 +42,9 @@ public abstract class Storage<T> where T : IIndexed
             List<T> detailsList = data.FromCsv<List<T>>();
             SetGenerator(detailsList);
             _dataDetailsMap = detailsList.Select(flight => new { flight.Id, flight = flight }).ToDictionary(x => x.Id,x=> x.flight);
-            return true;
+            return;
         }
-        return false;
+        WriteInFile();
     }
     public abstract override string ToString();
 }

@@ -2,62 +2,36 @@
 
 namespace AirportTicketBooking;
 
-public class FlightStorage : Flight, IFileReader, IFileWriter
+public class FlightStorage : Storage<FlightDetails>
 {
+    public int IdGenerator { get; set; }
     private static FlightStorage? _flightStorage = null;
-    private string _path;
-    private Dictionary<int,FlightDetails> _flightsDetailsMap;
-    public bool SaveDataBeforeClosing {
-        get;
-        set;
-    }
-    private FlightStorage(string path)
-    {
-        _path = path;
-        _flightsDetailsMap = new Dictionary<int, FlightDetails>();
-    }
-    public bool Add(FlightDetails flightDetails)
-    {
-        _flightsDetailsMap.Add(flightDetails.Id,flightDetails);
-        return true;
-    }
-    public Dictionary<int, FlightDetails> GetFlights()
-    {
-        return _flightsDetailsMap;
-    }
 
-    public static FlightStorage GetStorageInstance(string path = "FlightData.csv")
+    public int GetCurrentId()
+    {
+        return IdGenerator++;
+    }
+    private FlightStorage(string? path)
+    {
+        _defaultPath = "FlightData.csv";
+        _path = path ?? _defaultPath;
+        IdGenerator = 0;    
+        _dataDetailsMap = new Dictionary<int, FlightDetails>();
+    }
+    
+    public FlightDetails? FindFlight(int id)
+    {
+        return _dataDetailsMap.TryGetValue(id, out var flight) ? flight : null;
+    }
+    
+    public static FlightStorage GetStorageInstance(string? path = null)
     {
         if (_flightStorage == null)
         {
-            
             _flightStorage = new FlightStorage(path);
         }
-        
+        _flightStorage.ReadFile();
         return _flightStorage;
-    }
-    public bool ReadFile()
-    {
-        if (File.Exists(_path))
-        {
-            _flightsDetailsMap.Clear();
-            string data = File.ReadAllText(_path);
-            List<FlightDetails> flightDetailsList = data.FromCsv<List<FlightDetails>>();
-            IdGenerator = flightDetailsList[^1].Id + 1;
-            _flightsDetailsMap = flightDetailsList.Select(flight => new { flight.Id, flight = flight }).ToDictionary(x => x.Id,x=> x.flight);
-            return true;
-        }
-        return false;
-    }
-    public bool WriteInFile()
-    {
-        if (!File.Exists(_path))
-        {
-            _path = "FlightData.csv";
-        }
-        List<FlightDetails> flgithDetails = _flightsDetailsMap.Values.ToList();
-        File.WriteAllText(_path,flgithDetails.ToCsv());
-        return true;
     }
 
     public void WriteFromAUserFile(string path)
@@ -108,7 +82,7 @@ public class FlightStorage : Flight, IFileReader, IFileWriter
             try
             {
                 departureAirportId = int.Parse(fields[1]);
-                if (!airportStorage.FindAirport(departureAirportId))
+                if (airportStorage.FindAirport(departureAirportId) == null)
                 {
                     throw new Exception("Error: Airport does not exist");
                 }
@@ -122,7 +96,7 @@ public class FlightStorage : Flight, IFileReader, IFileWriter
             try
             {
                 arrivalAirportId = int.Parse(fields[2]);
-                if (!airportStorage.FindAirport(arrivalAirportId))
+                if (airportStorage.FindAirport(arrivalAirportId) == null)
                 {
                     throw new Exception("Error: Airport does not exist");
                 }
@@ -156,14 +130,14 @@ public class FlightStorage : Flight, IFileReader, IFileWriter
                 throw new Exception($"Error in Line {index}: Make sure the value is a positive time in the duration field");
             }
             FlightDetails newFlightDetails =
-                new FlightDetails(takeoffTime, planId, duration, departureAirportId, arrivalAirportId);
+                new FlightDetails(GetCurrentId(),takeoffTime, planId, duration, departureAirportId, arrivalAirportId);
             newFlights.Add(newFlightDetails);
         }
         
         foreach (var flight in newFlights)
         {
             IdGenerator++;
-            _flightsDetailsMap.Add(IdGenerator, flight);
+            _dataDetailsMap.Add(IdGenerator, flight);
         }
         flightStorage.WriteInFile();
     }
@@ -175,10 +149,23 @@ public class FlightStorage : Flight, IFileReader, IFileWriter
             WriteInFile();
         }
     }
+
+    protected override void SetGenerator(List<FlightDetails> detailsList)
+    {
+        try
+        {
+            IdGenerator = detailsList[^1].Id + 1;
+        }
+        catch (Exception e)
+        {
+            IdGenerator = 0;
+        }
+    }
+
     public override string ToString()
     {
         string data ="****************************";
-        foreach (var flight in _flightsDetailsMap)
+        foreach (var flight in _dataDetailsMap)
         {
             data += $"""
 

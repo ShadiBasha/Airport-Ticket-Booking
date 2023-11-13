@@ -2,5 +2,5 @@
 
 public interface IFileReader
 {
-    public bool ReadFile();
+    public void ReadFile();
 }

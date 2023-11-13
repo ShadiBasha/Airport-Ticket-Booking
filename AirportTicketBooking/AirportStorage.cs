@@ -2,40 +2,26 @@
 
 namespace AirportTicketBooking;
 
-public class AirportStorage : Airport, IFileWriter, IFileReader
+public class AirportStorage : Storage<AirportDetails>
 {
+    private int IdGenerator { get; set; }
     private static AirportStorage? _airportStorage = null;
-    private string _path;
-    private Dictionary<int,AirportDetails> _airportsDetailsMap;
-    public bool SaveDataBeforeClosing {
-        get;
-        set;
-    }
 
     private AirportStorage(string path)
     {
-        _path = path;
-        _airportsDetailsMap = new Dictionary<int, AirportDetails>();
+        _defaultPath = "AirportData.csv";
+        _path = path ?? _defaultPath;
+        _dataDetailsMap = new Dictionary<int, AirportDetails>();
     }
-
-    public bool Add(AirportDetails airportDetails)
+    
+    public int GetCurrentId()
     {
-        _airportsDetailsMap.Add(airportDetails.Id,airportDetails);
-        return true;
+        return IdGenerator++;
     }
-
-    public bool FindAirport(int id)
+    
+    public AirportDetails? FindAirport(int id)
     {
-        if (_airportsDetailsMap.ContainsKey(id))
-        {
-            return true;
-        }
-        return false;
-    }
-
-    public Dictionary<int, AirportDetails> getAirports()
-    {
-        return _airportsDetailsMap;
+        return _dataDetailsMap.TryGetValue(id, out var airport) ? airport : null;
     }
 
     public static AirportStorage GetStorageInstance(string path = "AirportData.csv")
@@ -44,35 +30,20 @@ public class AirportStorage : Airport, IFileWriter, IFileReader
         {
             _airportStorage = new AirportStorage(path);
         }
-        
+        _airportStorage.ReadFile();
         return _airportStorage;
     }
-    
-    public bool ReadFile()
-    {
-        if (File.Exists(_path))
-        {
-            string data = File.ReadAllText(_path);
-            List<AirportDetails> airportDetailsList = data.FromCsv<List<AirportDetails>>();
-            Airport.IdGenerator = airportDetailsList[^1].Id + 1;
-            _airportsDetailsMap = airportDetailsList
-                .Select(airport => new { airport.Id, airport })
-                .ToDictionary(x => x.Id,x=> x.airport);
-            return true;
-        }
-        return false;
-    }
-    
-    public bool WriteInFile()
-    {
-        if (!File.Exists(_path))
-        {
-            _path = "AirportData.csv";
-        }
 
-        List<AirportDetails> airportsDetails = _airportsDetailsMap.Values.ToList();
-        File.WriteAllText(_path,airportsDetails.ToCsv());
-        return true;
+    protected override void SetGenerator(List<AirportDetails> detailsList)
+    {
+        try
+        {
+            IdGenerator = detailsList[^1].Id + 1;
+        }
+        catch (Exception e)
+        {
+            IdGenerator = 0;
+        }    
     }
 
     ~AirportStorage()
@@ -86,7 +57,7 @@ public class AirportStorage : Airport, IFileWriter, IFileReader
     public override string ToString()
     {
         string data ="****************************";
-        foreach (var airportsDetails in _airportsDetailsMap)
+        foreach (var airportsDetails in _dataDetailsMap)
         {
             data += $"""
                     

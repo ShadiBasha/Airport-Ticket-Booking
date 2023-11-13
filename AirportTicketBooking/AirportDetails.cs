@@ -2,19 +2,18 @@
 
 namespace AirportTicketBooking;
 
-public class AirportDetails : Airport
+public class AirportDetails : IIndexed
 {
     public int Id { get; init; }
     public string Name { get; set; }
     public Country AirportCountry { get; set; }
     public string Address { get; set; }
-    public AirportDetails(string name, Country airportCountry, string address)
+    public AirportDetails(int id,string name, Country airportCountry, string address)
     {
-        Id = IdGenerator;
+        Id = id;
         Name = name;
         AirportCountry = airportCountry;
         Address = address;
-        IdGenerator++;
     }
 
     public override string ToString()

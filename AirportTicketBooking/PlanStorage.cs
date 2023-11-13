@@ -5,69 +5,49 @@ using ServiceStack;
 
 namespace AirportTicketBooking;
 
-public class PlanStorage : Plan, IFileReader, IFileWriter
+public class PlanStorage : Storage<PlanDetails>
 {
+    private int IdGenerator { get; set; }
     private static PlanStorage? _planStorage = null;
-    private string _path;
-    private Dictionary<int,PlanDetails> _plansDetailsMap;
-    public bool SaveDataBeforeClosing {
-        get;
-        set;
-    }
 
-    private PlanStorage(string path)
+    private PlanStorage(string? path)
     {
-        _path = path;
-        _plansDetailsMap = new Dictionary<int, PlanDetails>();
-    }
-
-    public bool Add(PlanDetails planDetails)
-    {
-        _plansDetailsMap.Add(planDetails.Id,planDetails);
-        return true;
+        _defaultPath = "PlanData.csv";
+        _path = path ?? _defaultPath;
+        IdGenerator = 0;
+        _dataDetailsMap = new Dictionary<int, PlanDetails>();
     }
 
     public PlanDetails? FindPlan(int id)
     {
-        return _plansDetailsMap.TryGetValue(id, out var plan) ? plan : null;
+        return _dataDetailsMap.TryGetValue(id, out var plan) ? plan : null;
+    }
+    
+    public int GetCurrentId()
+    {
+        return IdGenerator++;
     }
 
-    public static PlanStorage GetStorageInstance(string path = "PlanData.csv")
+    public static PlanStorage GetStorageInstance(string? path = null)
     {
         if (_planStorage == null)
         {
-            
             _planStorage = new PlanStorage(path);
         }
-        
+        _planStorage.ReadFile();
         return _planStorage;
     }
-    
-    public bool ReadFile()
-    {
-        if (File.Exists(_path))
-        {
-            string data = File.ReadAllText(_path);
-            List<PlanDetails> planDetailsList = data.FromCsv<List<PlanDetails>>();
-            Plan.IdGenerator = planDetailsList[^1].Id + 1;
-            _plansDetailsMap = planDetailsList
-                .Select(plan => new { plan.Id, plan })
-                .ToDictionary(x => x.Id,x=> x.plan);
-            return true;
-        }
-        return false;
-    }
-    
-    public bool WriteInFile()
-    {
-        if (!File.Exists(_path))
-        {
-            _path = "PlanData.csv";
-        }
 
-        List<PlanDetails> plansDetails = _plansDetailsMap.Values.ToList();
-        File.WriteAllText(_path,plansDetails.ToCsv());
-        return true;
+    protected override void SetGenerator(List<PlanDetails> detailsList)
+    {
+        try
+        {
+            IdGenerator = detailsList[^1].Id + 1;
+        }
+        catch (Exception e)
+        {
+            IdGenerator = 0;
+        }
     }
 
     ~PlanStorage()
@@ -81,7 +61,7 @@ public class PlanStorage : Plan, IFileReader, IFileWriter
     public override string ToString()
     {
         string data ="****************************";
-        foreach (var planDetails in _plansDetailsMap)
+        foreach (var planDetails in _dataDetailsMap)
         {
             data += $"""
                     

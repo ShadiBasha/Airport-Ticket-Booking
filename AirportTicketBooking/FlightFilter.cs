@@ -3,12 +3,11 @@
 public static class FlightFilter
 {
     public static int NumberOfResults { get; set; }
-    private static AirportStorage _airportStorage;
+    private static readonly AirportStorage AirportStorage;
     static FlightFilter()
     {
         NumberOfResults = 5;
-        _airportStorage = AirportStorage.GetStorageInstance();
-        _airportStorage.ReadFile();
+        AirportStorage = AirportStorage.GetStorageInstance();
     }
     
     public static Dictionary<int,FlightDetails> FilterById(Dictionary<int, FlightDetails> flightStorage,int id)
@@ -42,7 +41,7 @@ public static class FlightFilter
    public static Dictionary<int,FlightDetails> FilterByDepartureCountry(Dictionary<int, FlightDetails> flightStorage,Country departureCountry)
    {
 
-       return _airportStorage.getAirports()
+       return AirportStorage.GetData()
            .Where(airport => airport.Value.AirportCountry == departureCountry)
            .Join(flightStorage, airport => airport.Value.Id,
                flight => flight.Value.DepartureAirportId,
@@ -52,7 +51,7 @@ public static class FlightFilter
    
    public static Dictionary<int,FlightDetails> FilterByDestinationCountry(Dictionary<int, FlightDetails> flightStorage,Country destinationCountry)
    {
-       return _airportStorage.getAirports()
+       return AirportStorage.GetData()
            .Where(airport => airport.Value.AirportCountry == destinationCountry)
            .Join(flightStorage, airport => airport.Value.Id,
                flight => flight.Value.ArrivalAirportId,

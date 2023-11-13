@@ -1,6 +1,6 @@
 ﻿namespace AirportTicketBooking;
 
-public class FlightDetails : Flight
+public class FlightDetails : IIndexed
 {
     public int Id { get; init; }
     // private List<TripDetails> _trips;
@@ -25,15 +25,14 @@ public class FlightDetails : Flight
     public int DepartureAirportId { get; set;}
     public int ArrivalAirportId { get; set; }
     
-    public FlightDetails(DateTime takeoffTime, int planId, TimeOnly duration, int departureAirportId, int arrivalAirportId)
+    public FlightDetails(int id,DateTime takeoffTime, int planId, TimeOnly duration, int departureAirportId, int arrivalAirportId)
     {
+        Id = id;
         _takeoffTime = takeoffTime;
-        Id = IdGenerator;
         PlanId = planId;
         Duration = duration;
         DepartureAirportId = departureAirportId;
         ArrivalAirportId = arrivalAirportId;
-        IdGenerator++;
     }
 
     private Tuple<int, int, int> ComputePrices()
@@ -50,8 +49,7 @@ public class FlightDetails : Flight
     public override string ToString()
     {
         AirportStorage airportStorage = AirportStorage.GetStorageInstance();
-        airportStorage.ReadFile();
-        var airportDetails = airportStorage.getAirports();
+        var airportDetails = airportStorage.GetData();
         Tuple<int, int, int> prices = ComputePrices();
         return $"""
                 Flight {Id}

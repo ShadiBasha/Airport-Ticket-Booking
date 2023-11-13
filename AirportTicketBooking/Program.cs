@@ -6,9 +6,9 @@ class Program
 {
     public static int Main()
     {
-        FlightStorage fs = FlightStorage.GetStorageInstance();
-        fs.ReadFile();
-        Console.WriteLine(fs);
+        PlanStorage ps = PlanStorage.GetStorageInstance();
+        ps.WriteInFile();
+        Console.WriteLine(ps);
         return 0;
     }
 }
