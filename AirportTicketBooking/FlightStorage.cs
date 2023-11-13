@@ -21,7 +21,6 @@ public class FlightStorage : Flight, IFileReader, IFileWriter
         _flightsDetailsMap.Add(flightDetails.Id,flightDetails);
         return true;
     }
-
     public Dictionary<int, FlightDetails> GetFlights()
     {
         return _flightsDetailsMap;
