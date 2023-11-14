@@ -1,4 +1,4 @@
-﻿namespace AirportTicketBooking;
+﻿namespace AirportTicketBooking.Interfaces;
 
 public interface IIndexed
 {

@@ -1,6 +1,7 @@
-﻿using ServiceStack;
+﻿using AirportTicketBooking.Details;
+using ServiceStack;
 
-namespace AirportTicketBooking;
+namespace AirportTicketBooking.Storage;
 
 public class FlightStorage : Storage<FlightDetails>
 {

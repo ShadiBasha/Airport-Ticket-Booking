@@ -1,4 +1,8 @@
-﻿namespace AirportTicketBooking;
+﻿using AirportTicketBooking.Details;
+using AirportTicketBooking.Enum;
+using AirportTicketBooking.Storage;
+
+namespace AirportTicketBooking.Static_Classes;
 
 public static class FlightFilter
 {

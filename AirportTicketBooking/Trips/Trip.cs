@@ -1,4 +1,4 @@
-﻿namespace AirportTicketBooking;
+﻿namespace AirportTicketBooking.Trips;
 
 public abstract class Trip
 {

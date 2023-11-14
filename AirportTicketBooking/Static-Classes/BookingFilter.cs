@@ -1,6 +1,7 @@
-﻿using ServiceStack;
+﻿using AirportTicketBooking.Enum;
+using AirportTicketBooking.Storage;
 
-namespace AirportTicketBooking;
+namespace AirportTicketBooking.Static_Classes;
 
 public static class BookingFilter
 {

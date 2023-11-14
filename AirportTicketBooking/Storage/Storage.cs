@@ -1,7 +1,7 @@
-﻿using System.Data.Common;
+﻿using AirportTicketBooking.Interfaces;
 using ServiceStack;
 
-namespace AirportTicketBooking;
+namespace AirportTicketBooking.Storage;
 
 public abstract class Storage<T> : IFileReader, IFileWriter where T : IIndexed
 {

@@ -1,4 +1,7 @@
-﻿namespace AirportTicketBooking;
+﻿using AirportTicketBooking.Interfaces;
+using AirportTicketBooking.Storage;
+
+namespace AirportTicketBooking.Details;
 
 public class FlightDetails : IIndexed
 {

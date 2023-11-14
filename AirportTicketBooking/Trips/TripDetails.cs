@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using AirportTicketBooking.Details;
 
-namespace AirportTicketBooking;
+namespace AirportTicketBooking.Trips;
 
 public class TripDetails : Trip
 {

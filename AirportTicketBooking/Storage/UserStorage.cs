@@ -1,4 +1,7 @@
-﻿namespace AirportTicketBooking;
+﻿using AirportTicketBooking.Details;
+using AirportTicketBooking.Static_Classes;
+
+namespace AirportTicketBooking.Storage;
 
 public class UserStorage : Storage<UserDetails>
 {
@@ -14,6 +17,11 @@ public class UserStorage : Storage<UserDetails>
     public int GetCurrentId()
     {
         return IdGenerator++;
+    }
+
+    public UserDetails? FindUser(int id)
+    {
+        return _dataDetailsMap.TryGetValue(id, out var user) ? user : null;
     }
     public static UserStorage GetStorageInstance(string? path = null)
     {

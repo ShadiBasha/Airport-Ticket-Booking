@@ -1,4 +1,9 @@
-﻿namespace AirportTicketBooking;
+﻿using AirportTicketBooking.Enum;
+using AirportTicketBooking.Interfaces;
+using AirportTicketBooking.Static_Classes;
+using AirportTicketBooking.Storage;
+
+namespace AirportTicketBooking.Details;
 
 public class UserDetails : IIndexed
 {

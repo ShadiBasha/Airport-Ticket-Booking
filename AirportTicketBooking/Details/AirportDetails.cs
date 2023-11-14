@@ -1,6 +1,7 @@
-﻿using System.Reflection;
+﻿using AirportTicketBooking.Enum;
+using AirportTicketBooking.Interfaces;
 
-namespace AirportTicketBooking;
+namespace AirportTicketBooking.Details;
 
 public class AirportDetails : IIndexed
 {

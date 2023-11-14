@@ -1,9 +1,6 @@
-﻿using System.Globalization;
-using System.Net;
-using CsvHelper;
-using ServiceStack;
+﻿using AirportTicketBooking.Details;
 
-namespace AirportTicketBooking;
+namespace AirportTicketBooking.Storage;
 
 public class PlanStorage : Storage<PlanDetails>
 {

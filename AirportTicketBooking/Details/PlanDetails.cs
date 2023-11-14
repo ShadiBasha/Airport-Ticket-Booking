@@ -1,4 +1,6 @@
-﻿namespace AirportTicketBooking;
+﻿using AirportTicketBooking.Interfaces;
+
+namespace AirportTicketBooking.Details;
 
 public class PlanDetails : IIndexed
 {

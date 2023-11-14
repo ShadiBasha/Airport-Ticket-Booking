@@ -1,4 +1,4 @@
-﻿namespace AirportTicketBooking;
+﻿namespace AirportTicketBooking.Enum;
 
 public enum Classes
 {
