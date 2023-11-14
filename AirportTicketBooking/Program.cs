@@ -1,6 +1,8 @@
 ﻿using ServiceStack;
 using System.Security.Cryptography;
 using System.Text;
+using AirportTicketBooking.Details;
+using AirportTicketBooking.Enum;
 using AirportTicketBooking.Static_Classes;
 using AirportTicketBooking.Storage;
 
@@ -12,19 +14,26 @@ class Program
     {
         UserStorage us = UserStorage.GetStorageInstance();
         FlightStorage fs = FlightStorage.GetStorageInstance();
-        // UserDetails user = new UserDetails(us.GetCurrentId(), "salim", "123");
-        // us.AddData(user);
-        // user.BookAFlight(1,Classes.Economy);
-        // user.BookAFlight(2,Classes.FirstClass);
-        // user.BookAFlight(3,Classes.Economy);
-        // us.WriteInFile();
+        BookingStorage bs = BookingStorage.GetStorageInstance();
+        AirportStorage airs = AirportStorage.GetStorageInstance();
+        bs.ReadFile();
+        UserDetails user = new UserDetails(us.GetCurrentId(), "fadi", "123");
         
-        foreach (var data in BookingFilter.GetBookingInPriceRange(us,fs,100,20000))
+        // us.SaveDataBeforeClosing = true;
+        // fs.SaveDataBeforeClosing = true;
+        // bs.SaveDataBeforeClosing = true;
+        // us.AddData(user);
+        // user.BookAFlight(5,Classes.Economy);
+        // user.BookAFlight(2,Classes.FirstClass);
+        // user.BookAFlight(3,Classes.Business);
+        // us.WriteInFile();
+        // fs.WriteInFile();
+        // bs.WriteInFile();
+        foreach (var data in BookingFilter.GetAFlightBookings(bs.GetData(),7))
         {
-                Console.WriteLine($"{data.Item1} --- {data.Item2} --- {data.Item3} --- {data.Item4}");
+                Console.WriteLine($"{data.Value}");
         }
-
-        Console.WriteLine(fs);
+        // Console.WriteLine(bs);
         return 0;
     }
 }

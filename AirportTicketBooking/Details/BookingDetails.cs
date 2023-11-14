@@ -25,7 +25,8 @@ public class BookingDetails : IIndexed
         return $"""
                ****************************
                Booked flight for user {UserId} 
-               Username : {userStorage.FindUser(UserId)?.Name}
+               Username  : {userStorage.FindUser(UserId)?.Name}
+               User Class: {ClassType}
                {flightStorage.FindFlight(FlightId)}
                ****************************
                """;

@@ -26,7 +26,6 @@ public class BookingStorage : Storage<BookingDetails>
         {
             _bookingStorage = new BookingStorage(path);
         }
-        _bookingStorage.ReadFile();
         return _bookingStorage;
     }
     protected override void SetGenerator(List<BookingDetails> detailsList)
@@ -46,5 +45,6 @@ public class BookingStorage : Storage<BookingDetails>
         {
             WriteInFile();
         }
+
     }
 }

@@ -11,14 +11,14 @@ public class UserDetails : IIndexed
     public string Name { get; private set; }
     public int Password { get; private set; }
     public byte[] Salt { get; private set; }
-    public List<Tuple<int, Classes>> Bookings { get; private set; }
+    public List<int> BookingIds { get; private set; }
     public UserDetails(int id, string name, string password)
     {
         Id = id;
         Name = name;
         Salt = HashGenerator.GenerateSalt();
         Password = HashGenerator.HashPassword(password, Salt);        
-        Bookings = new List<Tuple<int, Classes>>();
+        BookingIds = new List<int>();
     }
     public void BookAFlight(int flightId, Classes classType)
     {
@@ -27,17 +27,20 @@ public class UserDetails : IIndexed
         {
             throw new Exception("Error : Flight does not Exists");
         }
-
-        Bookings.Add(Tuple.Create(flightId, classType));
+        BookingStorage bookingStorage = BookingStorage.GetStorageInstance();
+        var bookingId = bookingStorage.GetCurrentId();
+        bookingStorage.AddData(new BookingDetails(bookingId, flightId, Id, classType));
+        BookingIds.Add(bookingId);
     }
 
-    public void ModifyBooking(int flightId, Classes newClass)
+    public void ModifyBooking(int bookingId, Classes newClass)
     {
-        if (Bookings.Any(booking => booking.Item1 == flightId))
+        BookingStorage bookingStorage = BookingStorage.GetStorageInstance();
+        if (bookingStorage.FindBooking(bookingId) != null)
         {
-            var newBookings = Bookings
-                .Select(booking => booking.Item1 == flightId ? Tuple.Create(flightId, newClass) : booking).ToList();
-            Bookings = newBookings;
+            var flightId = bookingStorage.FindBooking(bookingId).FlightId;
+            bookingStorage.DeleteData(bookingId);
+            bookingStorage.AddData(new BookingDetails(bookingId, flightId, Id, newClass));
         }
         else
         {
@@ -45,12 +48,13 @@ public class UserDetails : IIndexed
         }
     }
     
-    public void CancelBooking(int flightId)
+    public void CancelBooking(int bookingId)
     {
-        if (Bookings.Any(booking => booking.Item1 == flightId))
+        BookingStorage bookingStorage = BookingStorage.GetStorageInstance();
+        if (bookingStorage.FindBooking(bookingId) != null)
         {
-            var newBookings = Bookings.Where(booking => booking.Item1 != flightId).ToList();
-            Bookings = newBookings;
+            bookingStorage.DeleteData(bookingId);
+            BookingIds.Remove(bookingId);
         }
         else
         {
@@ -60,23 +64,9 @@ public class UserDetails : IIndexed
 
     public override string ToString()
     {
-        FlightStorage flightStorage = FlightStorage.GetStorageInstance();
-        string data = "\n****************************\n";
-        foreach (var book in Bookings)
-        {
-            data += $"""
-                    User class : {book.Item2}
-                    {flightStorage.FindFlight(book.Item1)}
-                    ****************************
-                    
-                    """;
-        }
         return $"""
                 User {Id}
                 Username : {Name}
-                Flights
-                ****************************
-                {data}
                 """;
     }
 }
