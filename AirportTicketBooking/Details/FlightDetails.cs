@@ -35,7 +35,7 @@ public class FlightDetails : IIndexed
         ArrivalAirportId = arrivalAirportId;
     }
 
-    private Tuple<int, int, int> ComputePrices()
+    public int[] ComputePrices()
     {
         PlanStorage planStorage = PlanStorage.GetStorageInstance();
         planStorage.ReadFile();
@@ -43,14 +43,14 @@ public class FlightDetails : IIndexed
         int economyPrice = plan.EconomyPrice * Duration.Hour * 2 + plan.EconomyPrice * (Duration.Minute / 30);
         int businessPrice = plan.BusinessPrice * Duration.Hour * 2 + plan.BusinessPrice * (Duration.Minute / 30);
         int firstClassPrice = plan.FirstClassPrice * Duration.Hour * 2 + plan.FirstClassPrice * (Duration.Minute / 30);
-        return Tuple.Create(economyPrice, businessPrice, firstClassPrice);
+        return new [] {economyPrice,businessPrice,firstClassPrice};
     }
 
     public override string ToString()
     {
         AirportStorage airportStorage = AirportStorage.GetStorageInstance();
         var airportDetails = airportStorage.GetData();
-        Tuple<int, int, int> prices = ComputePrices();
+        var prices = ComputePrices();
         return $"""
                 Flight {Id}
                 Plan Id : {PlanId}
@@ -58,9 +58,9 @@ public class FlightDetails : IIndexed
                 Takeoff Date : {TakeoffTime}
                 Duration : {Duration.Hour}:{Duration.Minute.ToString().PadLeft(2,'0')}
                 Price
-                Economy     : {prices.Item1}$ 
-                Business    : {prices.Item2}$
-                First Class : {prices.Item3}$
+                Economy     : {prices[0]}$ 
+                Business    : {prices[1]}$
+                First Class : {prices[2]}$
                 """;
     }
     // public bool addTrip(TripDetails tripDetails)
