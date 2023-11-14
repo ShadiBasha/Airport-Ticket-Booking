@@ -2,7 +2,7 @@
 using AirportTicketBooking.Enum;
 using AirportTicketBooking.Storage;
 
-namespace AirportTicketBooking.Static_Classes;
+namespace AirportTicketBooking.Filter;
 
 public static class FlightFilter
 {

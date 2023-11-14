@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace AirportTicketBooking.Static_Classes;
+namespace AirportTicketBooking.Security;
 
 public static class HashGenerator
 {

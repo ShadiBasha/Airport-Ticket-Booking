@@ -1,6 +1,6 @@
 ﻿using AirportTicketBooking.Enum;
 using AirportTicketBooking.Interfaces;
-using AirportTicketBooking.Static_Classes;
+using AirportTicketBooking.Security;
 using AirportTicketBooking.Storage;
 
 namespace AirportTicketBooking.Details;

@@ -1,16 +1,14 @@
 ﻿using AirportTicketBooking.Details;
 using AirportTicketBooking.Enum;
 using AirportTicketBooking.Storage;
-using ServiceStack;
 
-namespace AirportTicketBooking.Static_Classes;
+namespace AirportTicketBooking.Filter;
 
 public static class BookingFilter
 {
     static BookingFilter()
     {
     }
-    //change
     public static Dictionary<int, BookingDetails> GetAFlightBookings(Dictionary<int, BookingDetails> bookings, int flightId)
     {
         return bookings
@@ -18,7 +16,6 @@ public static class BookingFilter
             .Where(booking => booking.FlightId == flightId)
             .ToDictionary(data => data.Id);
     }
-    //change 
     public static Dictionary<int, BookingDetails> GetBookingsInPriceRange(Dictionary<int, BookingDetails> bookings, FlightStorage flightStorage, int minPrice, int maxPrice)
     {
         var flightsInRange = flightStorage

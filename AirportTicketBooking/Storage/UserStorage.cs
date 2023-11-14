@@ -1,5 +1,5 @@
 ﻿using AirportTicketBooking.Details;
-using AirportTicketBooking.Static_Classes;
+using AirportTicketBooking.Security;
 
 namespace AirportTicketBooking.Storage;
 
