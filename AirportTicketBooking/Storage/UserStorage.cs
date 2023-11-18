@@ -29,7 +29,6 @@ public class UserStorage : Storage<UserDetails>
         {
             _userStorage = new UserStorage(path);
         }
-        _userStorage.ReadFile();
         return _userStorage;
     }
     protected override void SetGenerator(List<UserDetails> detailsList)

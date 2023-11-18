@@ -19,9 +19,11 @@ public class AirportStorage : Storage<AirportDetails>
         return IdGenerator++;
     }
     
-    public AirportDetails? FindAirport(int id)
+    public AirportDetails? FindAirport(int? id)
     {
-        return _dataDetailsMap.TryGetValue(id, out var airport) ? airport : null;
+        if(id != null)
+            return _dataDetailsMap.TryGetValue((int)id, out var airport) ? airport : null;
+        return null;
     }
 
     public static AirportStorage GetStorageInstance(string path = "AirportData.csv")
@@ -30,7 +32,6 @@ public class AirportStorage : Storage<AirportDetails>
         {
             _airportStorage = new AirportStorage(path);
         }
-        _airportStorage.ReadFile();
         return _airportStorage;
     }
 

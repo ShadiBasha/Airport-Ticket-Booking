@@ -31,7 +31,6 @@ public class PlanStorage : Storage<PlanDetails>
         {
             _planStorage = new PlanStorage(path);
         }
-        _planStorage.ReadFile();
         return _planStorage;
     }
 

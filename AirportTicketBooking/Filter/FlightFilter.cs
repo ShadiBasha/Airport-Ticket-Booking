@@ -13,7 +13,16 @@ public static class FlightFilter
         NumberOfResults = 5;
         AirportStorage = AirportStorage.GetStorageInstance();
     }
-    
+
+    public static Dictionary<int, FlightDetails> FilterFlightInPriceRange(
+        Dictionary<int, FlightDetails> flightDetailsMap, int minPrice, int maxPrice, Classes classType = Classes.Economy)
+    {
+        return flightDetailsMap
+            .Values
+            .Where(flight => flight.ComputePrices()[(int)classType] >= minPrice && flight.ComputePrices()[(int)classType] <= maxPrice)
+            .ToDictionary(flight => flight.Id);
+    }
+
     public static Dictionary<int,FlightDetails> FilterById(Dictionary<int, FlightDetails> flightStorage,int id)
     {
         return flightStorage
@@ -31,14 +40,14 @@ public static class FlightFilter
    public static Dictionary<int,FlightDetails> FilterByDepartureAirport(Dictionary<int, FlightDetails> flightStorage,int departureAirport)
    {
         return flightStorage
-            .Where(flight => flight.Value.DepartureAirportId >= departureAirport)
+            .Where(flight => flight.Value.DepartureAirportId == departureAirport)
             .ToDictionary(flight => flight.Key, flight => flight.Value);
     }   
    
    public static Dictionary<int,FlightDetails> FilterByArrivalAirport(Dictionary<int, FlightDetails> flightStorage,int arrivalAirport)
    {
        return flightStorage
-           .Where(flight => flight.Value.ArrivalAirportId >= arrivalAirport)
+           .Where(flight => flight.Value.ArrivalAirportId == arrivalAirport)
            .ToDictionary(flight => flight.Key, flight => flight.Value);
    }
    
@@ -61,5 +70,24 @@ public static class FlightFilter
                flight => flight.Value.ArrivalAirportId,
                (airport,flight) => flight.Value)
            .ToDictionary(flight => flight.Id, flight => flight);
+   }
+
+   public static Dictionary<int, FlightDetails> FilterByAll(Dictionary<int, FlightDetails> flightStorage,
+       DateTime? dateTime, int? departureAirport, int? arrivalAirport, Country? departureCountry,
+       Country? destinationCountry, int? minPrice, int? maxPrice, Classes? classType = Classes.Economy)
+   {
+       flightStorage = dateTime != null ? 
+           FilterByDepartureDate(flightStorage, (DateTime)dateTime) : flightStorage;
+       flightStorage = departureAirport != null ? 
+           FilterByDepartureAirport(flightStorage, (int)departureAirport) : flightStorage;
+       flightStorage = arrivalAirport != null ? 
+           FilterByArrivalAirport(flightStorage, (int)arrivalAirport) : flightStorage;
+       flightStorage = departureCountry != null ?
+           FilterByDepartureCountry(flightStorage, (Country)departureCountry) : flightStorage;
+       flightStorage = destinationCountry != null ?
+           FilterByDestinationCountry(flightStorage, (Country)destinationCountry) : flightStorage;
+       flightStorage = minPrice != null && maxPrice != null && classType != null ?
+           FilterFlightInPriceRange(flightStorage, (int)minPrice, (int) maxPrice, (Classes)classType) : flightStorage;
+       return flightStorage;
    }
 }

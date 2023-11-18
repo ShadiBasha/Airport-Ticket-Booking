@@ -31,7 +31,6 @@ public class FlightStorage : Storage<FlightDetails>
         {
             _flightStorage = new FlightStorage(path);
         }
-        _flightStorage.ReadFile();
         return _flightStorage;
     }
 

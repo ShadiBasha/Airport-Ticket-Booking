@@ -36,7 +36,7 @@ public class UserDetails : IIndexed
     public void ModifyBooking(int bookingId, Classes newClass)
     {
         BookingStorage bookingStorage = BookingStorage.GetStorageInstance();
-        if (bookingStorage.FindBooking(bookingId) != null)
+        if (bookingStorage.FindBooking(bookingId) != null && BookingIds.Contains(bookingId))
         {
             var flightId = bookingStorage.FindBooking(bookingId).FlightId;
             bookingStorage.DeleteData(bookingId);
@@ -51,7 +51,7 @@ public class UserDetails : IIndexed
     public void CancelBooking(int bookingId)
     {
         BookingStorage bookingStorage = BookingStorage.GetStorageInstance();
-        if (bookingStorage.FindBooking(bookingId) != null)
+        if (bookingStorage.FindBooking(bookingId) != null && BookingIds.Contains(bookingId))
         {
             bookingStorage.DeleteData(bookingId);
             BookingIds.Remove(bookingId);
