@@ -1,4 +1,5 @@
-﻿using ServiceStack;
+﻿using System.Reflection;
+using ServiceStack;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Channels;
@@ -71,7 +72,7 @@ class Program
                                5 - Departure Airport   : {AirportStorageInstance.FindAirport(departureAirport)?.Name}
                                6 - Arrival Airport     : {AirportStorageInstance.FindAirport(arrivalAirport)?.Name}
                                7 - Book Flight.
-                               8 - Clear Filters
+                               C - Clear Filters
                                E - Exit
                                """);
             command = Console.ReadLine();
@@ -213,7 +214,7 @@ class Program
                 UserStorageInstance.WriteInFile();
                 continue;
             }
-            else if (command == "8")
+            else if (command == "C")
             {
                 minPrice = null;
                 maxPrice = null;
@@ -223,7 +224,6 @@ class Program
                 departureAirport = null;
                 arrivalAirport = null;
                 classType = null;
-                flightDetailsMap = FlightStorageInstance.GetData();
                 Console.WriteLine("Filters cleared.");
             }
             else if (command == "E" || command == "e")
@@ -235,9 +235,23 @@ class Program
                 Console.WriteLine("Invalid command. Please enter a valid option.");
                 continue;
             }
-            flightDetailsMap = FlightStorageInstance.GetData();
-            flightDetailsMap = FlightFilter.FilterByAll(flightDetailsMap,departureDate,departureAirport,arrivalAirport,departureCountry,destinationCountry,minPrice,maxPrice,classType);
-            Console.WriteLine(FormatData(flightDetailsMap));
+
+            foreach (var flight in FlightFilter.FilterByAll(flightDetailsMap,departureDate,departureAirport,arrivalAirport,departureCountry,destinationCountry,minPrice,maxPrice,classType)) 
+            {
+                Console.Clear();
+                Console.WriteLine("Results : ");
+                Console.WriteLine(flight);
+                Console.WriteLine("""
+                                  N: next
+                                  E: Exit
+                                  """);
+                string? nextExit;
+                nextExit = Console.ReadLine();
+                if (nextExit == "E")
+                {
+                    break;
+                }
+            }
         } while (true);
         Console.Clear();
         UserPage();
@@ -365,9 +379,283 @@ class Program
     }
     static void FilterBookings()
     {
+        int? flightId = null;
+        int? userId = null;
+        int? maxPrice = null;
+        int? minPrice = null;
+        Country? departureCountry = null;
+        Country? destinationCountry = null;
+        DateTime? departureDate = null;
+        int? departureAirport = null;
+        int? arrivalAirport = null;
+        Classes? classType = null;
+        string? command;
+        Console.WriteLine(FormatData(BookingStorageInstance.GetData()));
+        do
+        {
+            Console.WriteLine($"""
+                               Filter Bookings
+                               1 - Flight ID           : {flightId}
+                               2 - Price               : {minPrice}  {maxPrice}
+                               3 - Departure Country   : {departureCountry}
+                               4 - Destination Country : {destinationCountry}
+                               5 - Departure Date      : {departureDate}
+                               6 - Departure Airport   : {AirportStorageInstance.FindAirport(departureAirport)?.Name}
+                               7 - Arrival Airport     : {AirportStorageInstance.FindAirport(arrivalAirport)?.Name}
+                               8 - Passenger           : {userId}
+                               9 - Class               : {classType}
+                               C - Clear Filters
+                               E - Exit
+                               """);
+            command = Console.ReadLine();
+            if (command == "1")
+            {
+                Console.WriteLine(FlightStorageInstance);
+                Console.WriteLine("Enter the Flight ID");
+                if (int.TryParse(Console.ReadLine(), out int enteredFlightId))
+                {
+                    flightId = enteredFlightId;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input for Flight ID. Please enter a valid integer.");
+                } 
+            }
+            else if (command == "2")
+            {
+                int min = -1;
+                int max = Int32.MaxValue;
+                Console.WriteLine("Enter minimum price:");
+                if (int.TryParse(Console.ReadLine(), out int enteredMinPrice))
+                {
+                    min = enteredMinPrice;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input for Minimum price. Please enter a valid integer.");
+                }
+
+                Console.WriteLine("Enter maximum price:");
+                if (int.TryParse(Console.ReadLine(), out int enteredMaxPrice))
+                {
+                    max = enteredMaxPrice;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input for Maximum price. Please enter a valid integer.");
+                }
+
+                if (min != -1 && max != Int32.MaxValue)
+                {
+                    minPrice = min;
+                    maxPrice = max;
+                }
+            }
+            else if (command == "3")
+            {
+                PrintEnumOptions<Country>();
+                Console.WriteLine("Enter the Country ID");
+                if (int.TryParse(Console.ReadLine(), out int enteredDepartureCountry))
+                {
+                    departureCountry = (Country)enteredDepartureCountry;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input for Departure country. Please enter a valid integer.");
+                }
+            }
+            else if (command == "4")
+            {
+                PrintEnumOptions<Country>();
+                Console.WriteLine("Enter the Country ID");
+                if (int.TryParse(Console.ReadLine(), out int enteredDestinationCountry))
+                {
+                    destinationCountry = (Country)enteredDestinationCountry;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input for Destination country. Please enter a valid integer.");
+                }
+            }
+            else if (command == "5")
+            {
+                Console.WriteLine("Enter departure date (YYYY-MM-DD):");
+                if (DateTime.TryParse(Console.ReadLine(), out DateTime enteredDepartureDate))
+                {
+                    departureDate = enteredDepartureDate;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input for Departure date. Please enter a valid date.");
+                }
+            }
+            else if (command == "6")
+            {
+                Console.WriteLine(AirportStorageInstance);
+                Console.WriteLine("Enter the departure airport ID");
+                if (int.TryParse(Console.ReadLine(), out int enteredDepartureAirport))
+                {
+                    departureAirport = enteredDepartureAirport;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input for Departure airport. Please enter a valid integer.");
+                }
+            }
+            else if (command == "7")
+            {
+                Console.WriteLine(AirportStorageInstance);
+                Console.WriteLine("Enter the arrival airport ID");
+                if (int.TryParse(Console.ReadLine(), out int enteredArrivalAirport))
+                {
+                    arrivalAirport = enteredArrivalAirport;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input for Arrival airport. Please enter a valid integer.");
+                }
+            }
+            else if (command == "8")
+            {
+                Console.WriteLine(UserStorageInstance);
+                Console.WriteLine("Enter the Passenger ID");
+                if (int.TryParse(Console.ReadLine(), out int enteredUserId))
+                {
+                     userId = enteredUserId;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input for User ID. Please enter a valid integer.");
+                }
+            }
+            else if (command == "9")
+            {
+                PrintEnumOptions<Classes>();
+                Console.WriteLine("Enter the Class ID");
+                if (int.TryParse(Console.ReadLine(), out int enteredClass))
+                {
+                    classType = (Classes)enteredClass;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input for Class type ID. Please enter a valid integer.");
+                }
+            }
+            else if (command == "C")
+            {
+                flightId = null;
+                userId = null;
+                minPrice = null;
+                maxPrice = null;
+                departureCountry = null;
+                destinationCountry = null;
+                departureDate = null;
+                departureAirport = null;
+                arrivalAirport = null;
+                classType = null;
+                Console.WriteLine("Filters cleared.");
+            }
+            else if (command == "E" || command == "e")
+            {
+                break;
+            }
+            else
+            {
+                Console.WriteLine("Invalid command. Please enter a valid option.");
+                continue;
+            }
+            foreach (var booking in BookingFilter.FilterByAll(BookingStorageInstance.GetData(),FlightStorageInstance,AirportStorageInstance,flightId,minPrice,maxPrice,departureCountry,destinationCountry,departureAirport,arrivalAirport,userId,classType))
+            {
+                Console.Clear();
+                Console.WriteLine("Results : ");
+                Console.WriteLine(booking);
+                Console.WriteLine("""
+                                  N: next
+                                  E: Exit
+                                  """);
+                string? nextExit;
+                nextExit = Console.ReadLine();
+                if (nextExit == "E")
+                {
+                    break;
+                }
+            }
+        } while (true);
+        Console.Clear();
+        AdminPage();
     }
     static void UploadFlights()
     {
+        string? command;
+        do
+        {
+            Console.WriteLine("""
+                              Upload flights
+                              1 - Show manual
+                              2 - Show Plans
+                              3 - Show Airports
+                              4 - Upload Flight
+                              E - Exit
+                              """);
+            command = Console.ReadLine();
+            if (command == "1")
+            {
+                Console.Clear();
+                Type type = typeof(FlightDetails);
+                Console.WriteLine("--------------------------------");
+                foreach (var property in type.GetProperties())
+                {
+                    Console.WriteLine($"""
+                                      Property Name : {property.Name}
+                                      Property Type : {property.PropertyType}
+                                      --------------------------------
+                                      """);
+                }
+
+                Console.WriteLine("""
+                                  Note :
+                                  - Takeoff Time should be in this format YYYY-MM-DD HH:MM:SS.
+                                  - Airports ID should be for an existing Airport.
+                                  - Plan ID should be for an existing Plan.
+                                  - Data should be Entered in this 
+                                  --> (Plan ID, Departure Airport ID, Arrival Airport ID, Takeoff Time, Duration)
+                                  """);
+            }
+            else if (command == "2")
+            {
+                Console.WriteLine(PlanStorageInstance);
+            }
+            else if (command == "3")
+            {
+                Console.WriteLine(AirportStorageInstance);
+            }
+            else if (command == "4")
+            {
+                Console.Clear();
+                Console.WriteLine("File Path");
+                string? path = Console.ReadLine();
+                if (!File.Exists(path))
+                {
+                    Console.WriteLine("Error : File does not exist please check the path and try again");
+                    continue;
+                }
+                try
+                {  
+                    FlightStorageInstance.WriteFromAUserFile(path);
+                    Console.WriteLine("Flights are Uploaded successfully");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+            else if (command == "E" || command == "e")
+            {
+                break;
+            }
+        } while (true);
+        Console.Clear();
+        AdminPage();
     }
     static void AdminPage()
     {
@@ -421,7 +709,6 @@ class Program
             LandingPage();
         }
     }
-
     static void AdminLogin()
     {
         Console.WriteLine("Password");

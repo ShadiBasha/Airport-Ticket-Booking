@@ -6,9 +6,6 @@ namespace AirportTicketBooking.Filter;
 
 public static class BookingFilter
 {
-    static BookingFilter()
-    {
-    }
     public static Dictionary<int, BookingDetails> GetAFlightBookings(Dictionary<int, BookingDetails> bookings, int flightId)
     {
         return bookings
@@ -16,6 +13,7 @@ public static class BookingFilter
             .Where(booking => booking.FlightId == flightId)
             .ToDictionary(data => data.Id);
     }
+    
     public static Dictionary<int, BookingDetails> GetBookingsInPriceRange(Dictionary<int, BookingDetails> bookings, FlightStorage flightStorage, int minPrice, int maxPrice)
     {
         var flightsInRange = flightStorage
@@ -32,7 +30,7 @@ public static class BookingFilter
                                booking.Item2[(int)booking.Item1.ClassType] <= maxPrice)
             .ToDictionary(data => data.Item1.Id, data => data.Item1);
     }
-
+    
     public static Dictionary<int, BookingDetails> GetBookingsFromCountry(Dictionary<int, BookingDetails> bookings, FlightStorage flightStorage, AirportStorage airportStorage,
         Country departureCountry)
     {
@@ -119,4 +117,19 @@ public static class BookingFilter
             .ToDictionary(x => x.Id);
     }
 
+    public static IEnumerable<BookingDetails> FilterByAll(Dictionary<int, BookingDetails> bookings,FlightStorage flightStorage, AirportStorage airportStorage,int? flightId, int? minPrice, int? maxPrice,Country? departureCountry,Country? arrivalCountry,int? fromAirportId,int? toAirportId,int? userId, Classes? classType)
+    {
+        bookings = flightId != null ? GetAFlightBookings(bookings, (int)flightId) : bookings;
+        bookings = minPrice != null && maxPrice != null ? GetBookingsInPriceRange(bookings,flightStorage, (int)minPrice,(int)maxPrice) : bookings;
+        bookings = departureCountry != null ? GetBookingsFromCountry(bookings,flightStorage,airportStorage, (Country)departureCountry) : bookings;
+        bookings = arrivalCountry != null ? GetBookingsToCountry(bookings,flightStorage,airportStorage, (Country)arrivalCountry) : bookings;
+        bookings = fromAirportId != null ? GetBookingsFromAirport(bookings,flightStorage, (int)fromAirportId) : bookings;
+        bookings = toAirportId != null ? GetBookingsToAirport(bookings,flightStorage, (int)toAirportId) : bookings;
+        bookings = userId != null ? GetUserBookings(bookings, (int)userId) : bookings;
+        bookings = classType != null ? GetBookingsWithClass(bookings, (Classes)classType) : bookings;
+        foreach (var booking in bookings.Values)
+        {
+            yield return booking;
+        }
+    }
 }

@@ -72,7 +72,7 @@ public static class FlightFilter
            .ToDictionary(flight => flight.Id, flight => flight);
    }
 
-   public static Dictionary<int, FlightDetails> FilterByAll(Dictionary<int, FlightDetails> flightStorage,
+   public static IEnumerable<FlightDetails> FilterByAll(Dictionary<int, FlightDetails> flightStorage,
        DateTime? dateTime, int? departureAirport, int? arrivalAirport, Country? departureCountry,
        Country? destinationCountry, int? minPrice, int? maxPrice, Classes? classType = Classes.Economy)
    {
@@ -88,6 +88,9 @@ public static class FlightFilter
            FilterByDestinationCountry(flightStorage, (Country)destinationCountry) : flightStorage;
        flightStorage = minPrice != null && maxPrice != null && classType != null ?
            FilterFlightInPriceRange(flightStorage, (int)minPrice, (int) maxPrice, (Classes)classType) : flightStorage;
-       return flightStorage;
+       foreach (var flight in flightStorage)
+       {
+           yield return flight.Value;
+       }
    }
 }
