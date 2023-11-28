@@ -1,49 +1,27 @@
-﻿using AirportTicketBooking.Details;
+﻿using AirportTicketBooking.Enum;
+using AirportTicketBooking.Interfaces;
+using AirportTicketBooking.Models;
 using ServiceStack;
 
 namespace AirportTicketBooking.Storage;
 
-public class FlightStorage : Storage<FlightDetails>
-{
-    public int IdGenerator { get; set; }
-    private static FlightStorage? _flightStorage = null;
-
-    public int GetCurrentId()
-    {
-        return IdGenerator++;
-    }
-    private FlightStorage(string? path)
-    {
-        _defaultPath = "FlightData.csv";
-        _path = path ?? _defaultPath;
-        IdGenerator = 0;    
-        _dataDetailsMap = new Dictionary<int, FlightDetails>();
-    }
-    
-    public FlightDetails? FindFlight(int id)
+public class FlightStorage : Storage<Flight>, IStorage
+{ 
+    public FlightStorage(string path): base(path) {}
+    public Flight? FindFlight(int id)
     {
         return _dataDetailsMap.TryGetValue(id, out var flight) ? flight : null;
     }
-    
-    public static FlightStorage GetStorageInstance(string? path = null)
-    {
-        if (_flightStorage == null)
-        {
-            _flightStorage = new FlightStorage(path);
-        }
-        return _flightStorage;
-    }
-
     public void WriteFromAUserFile(string path)
     {
         if (!File.Exists(path))
         {
             throw new Exception("Error: Can't access the file Check the file path and try again");
         }
-        FlightStorage flightStorage = GetStorageInstance();
-        PlanStorage planStorage = PlanStorage.GetStorageInstance();
-        AirportStorage airportStorage = AirportStorage.GetStorageInstance();
-        var newFlights = new List<FlightDetails>();
+        var flightStorage = StorageFactory.GetStorage(StorageType.Flight) as FlightStorage;
+        var planStorage = StorageFactory.GetStorage(StorageType.Plan) as PlanStorage;
+        var airportStorage = StorageFactory.GetStorage(StorageType.Airport) as AirportStorage;
+        var newFlights = new List<Flight>();
         var reader = File.OpenRead(path);
         var lines = reader.ReadLines();
 
@@ -126,9 +104,9 @@ public class FlightStorage : Storage<FlightDetails>
             {
                 throw new Exception($"Error in Line {index}: Make sure the value is a positive time in the duration field");
             }
-            FlightDetails newFlightDetails =
-                new FlightDetails(GetCurrentId(),takeoffTime, planId, duration, departureAirportId, arrivalAirportId);
-            newFlights.Add(newFlightDetails);
+            Flight newFlight =
+                new Flight(GetCurrentId(),takeoffTime, planId, duration, departureAirportId, arrivalAirportId);
+            newFlights.Add(newFlight);
         }
         
         foreach (var flight in newFlights)
@@ -136,9 +114,8 @@ public class FlightStorage : Storage<FlightDetails>
             IdGenerator++;
             _dataDetailsMap.Add(IdGenerator, flight);
         }
-        flightStorage.WriteInFile();
+        flightStorage?.WriteInFile();
     }
-
     ~FlightStorage()
     {
         if (SaveDataBeforeClosing)
@@ -146,16 +123,82 @@ public class FlightStorage : Storage<FlightDetails>
             WriteInFile();
         }
     }
-
-    protected override void SetGenerator(List<FlightDetails> detailsList)
+    public Dictionary<int, Flight> FilterFlightInPriceRange(int minPrice, int maxPrice, Classes classType = Classes.Economy)
     {
-        try
-        {
-            IdGenerator = detailsList[^1].Id + 1;
-        }
-        catch (Exception e)
-        {
-            IdGenerator = 0;
-        }
+        return _dataDetailsMap
+            .Values
+            .Where(flight => flight.ComputePrices()[(int)classType] >= minPrice && flight.ComputePrices()[(int)classType] <= maxPrice)
+            .ToDictionary(flight => flight.Id);
     }
+
+    public Dictionary<int,Flight> FilterById(int id)
+    {
+        return _dataDetailsMap
+            .Where(flight => flight.Key == id)
+            .ToDictionary(flight => flight.Key, flight => flight.Value);
+    } 
+    
+    public Dictionary<int,Flight> FilterByDepartureDate(DateTime dateTime)
+    {
+        return _dataDetailsMap
+            .Where(flight => flight.Value.TakeoffTime >= dateTime)
+            .ToDictionary(flight => flight.Key, flight => flight.Value);
+    }   
+    
+   public  Dictionary<int,Flight> FilterByDepartureAirport(int departureAirport)
+   {
+        return _dataDetailsMap
+            .Where(flight => flight.Value.DepartureAirportId == departureAirport)
+            .ToDictionary(flight => flight.Key, flight => flight.Value);
+    }   
+   
+   public Dictionary<int,Flight> FilterByArrivalAirport(int arrivalAirport)
+   {
+       return _dataDetailsMap
+           .Where(flight => flight.Value.ArrivalAirportId == arrivalAirport)
+           .ToDictionary(flight => flight.Key, flight => flight.Value);
+   }
+   
+   public Dictionary<int,Flight> FilterByDepartureCountry(AirportStorage airportStorage,Country departureCountry)
+   {
+       return airportStorage.GetData()
+           .Where(airport => airport.Value.AirportCountry == departureCountry)
+           .Join(_dataDetailsMap, airport => airport.Value.Id,
+               flight => flight.Value.DepartureAirportId,
+               (airport,flight) => flight.Value)
+           .ToDictionary(flight => flight.Id, flight => flight);
+   }
+   
+   public Dictionary<int,Flight> FilterByDestinationCountry(AirportStorage airportStorage,Country destinationCountry)
+   {
+       return airportStorage.GetData()
+           .Where(airport => airport.Value.AirportCountry == destinationCountry)
+           .Join(_dataDetailsMap, airport => airport.Value.Id,
+               flight => flight.Value.ArrivalAirportId,
+               (airport,flight) => flight.Value)
+           .ToDictionary(flight => flight.Id, flight => flight);
+   }
+
+   public IEnumerable<Flight> FilterByAll(AirportStorage airportStorage,
+       DateTime? dateTime, int? departureAirport, int? arrivalAirport, Country? departureCountry,
+       Country? destinationCountry, int? minPrice, int? maxPrice, Classes? classType = Classes.Economy)
+   {
+       var flightStorage = _dataDetailsMap.CreateCopy();
+       flightStorage = dateTime != null ? 
+           FilterByDepartureDate((DateTime)dateTime) : flightStorage;
+       flightStorage = departureAirport != null ? 
+           FilterByDepartureAirport((int)departureAirport) : flightStorage;
+       flightStorage = arrivalAirport != null ? 
+           FilterByArrivalAirport((int)arrivalAirport) : flightStorage;
+       flightStorage = departureCountry != null ?
+           FilterByDepartureCountry(airportStorage,(Country)departureCountry) : flightStorage;
+       flightStorage = destinationCountry != null ?
+           FilterByDestinationCountry(airportStorage,(Country)destinationCountry) : flightStorage;
+       flightStorage = minPrice != null && maxPrice != null && classType != null ?
+           FilterFlightInPriceRange((int)minPrice, (int) maxPrice, (Classes)classType) : flightStorage;
+       foreach (var flight in flightStorage)
+       {
+           yield return flight.Value;
+       }
+   }
 }

@@ -1,96 +1,10 @@
-﻿using AirportTicketBooking.Details;
-using AirportTicketBooking.Enum;
+﻿using AirportTicketBooking.Enum;
+using AirportTicketBooking.Models;
 using AirportTicketBooking.Storage;
 
 namespace AirportTicketBooking.Filter;
 
 public static class FlightFilter
 {
-    public static int NumberOfResults { get; set; }
-    private static readonly AirportStorage AirportStorage;
-    static FlightFilter()
-    {
-        NumberOfResults = 5;
-        AirportStorage = AirportStorage.GetStorageInstance();
-    }
-
-    public static Dictionary<int, FlightDetails> FilterFlightInPriceRange(
-        Dictionary<int, FlightDetails> flightDetailsMap, int minPrice, int maxPrice, Classes classType = Classes.Economy)
-    {
-        return flightDetailsMap
-            .Values
-            .Where(flight => flight.ComputePrices()[(int)classType] >= minPrice && flight.ComputePrices()[(int)classType] <= maxPrice)
-            .ToDictionary(flight => flight.Id);
-    }
-
-    public static Dictionary<int,FlightDetails> FilterById(Dictionary<int, FlightDetails> flightStorage,int id)
-    {
-        return flightStorage
-            .Where(flight => flight.Key == id)
-            .ToDictionary(flight => flight.Key, flight => flight.Value);
-    } 
-    
-    public static Dictionary<int,FlightDetails> FilterByDepartureDate(Dictionary<int, FlightDetails> flightStorage,DateTime dateTime)
-    {
-        return flightStorage
-            .Where(flight => flight.Value.TakeoffTime >= dateTime)
-            .ToDictionary(flight => flight.Key, flight => flight.Value);
-    }   
-    
-   public static Dictionary<int,FlightDetails> FilterByDepartureAirport(Dictionary<int, FlightDetails> flightStorage,int departureAirport)
-   {
-        return flightStorage
-            .Where(flight => flight.Value.DepartureAirportId == departureAirport)
-            .ToDictionary(flight => flight.Key, flight => flight.Value);
-    }   
-   
-   public static Dictionary<int,FlightDetails> FilterByArrivalAirport(Dictionary<int, FlightDetails> flightStorage,int arrivalAirport)
-   {
-       return flightStorage
-           .Where(flight => flight.Value.ArrivalAirportId == arrivalAirport)
-           .ToDictionary(flight => flight.Key, flight => flight.Value);
-   }
-   
-   public static Dictionary<int,FlightDetails> FilterByDepartureCountry(Dictionary<int, FlightDetails> flightStorage,Country departureCountry)
-   {
-
-       return AirportStorage.GetData()
-           .Where(airport => airport.Value.AirportCountry == departureCountry)
-           .Join(flightStorage, airport => airport.Value.Id,
-               flight => flight.Value.DepartureAirportId,
-               (airport,flight) => flight.Value)
-           .ToDictionary(flight => flight.Id, flight => flight);
-   }
-   
-   public static Dictionary<int,FlightDetails> FilterByDestinationCountry(Dictionary<int, FlightDetails> flightStorage,Country destinationCountry)
-   {
-       return AirportStorage.GetData()
-           .Where(airport => airport.Value.AirportCountry == destinationCountry)
-           .Join(flightStorage, airport => airport.Value.Id,
-               flight => flight.Value.ArrivalAirportId,
-               (airport,flight) => flight.Value)
-           .ToDictionary(flight => flight.Id, flight => flight);
-   }
-
-   public static IEnumerable<FlightDetails> FilterByAll(Dictionary<int, FlightDetails> flightStorage,
-       DateTime? dateTime, int? departureAirport, int? arrivalAirport, Country? departureCountry,
-       Country? destinationCountry, int? minPrice, int? maxPrice, Classes? classType = Classes.Economy)
-   {
-       flightStorage = dateTime != null ? 
-           FilterByDepartureDate(flightStorage, (DateTime)dateTime) : flightStorage;
-       flightStorage = departureAirport != null ? 
-           FilterByDepartureAirport(flightStorage, (int)departureAirport) : flightStorage;
-       flightStorage = arrivalAirport != null ? 
-           FilterByArrivalAirport(flightStorage, (int)arrivalAirport) : flightStorage;
-       flightStorage = departureCountry != null ?
-           FilterByDepartureCountry(flightStorage, (Country)departureCountry) : flightStorage;
-       flightStorage = destinationCountry != null ?
-           FilterByDestinationCountry(flightStorage, (Country)destinationCountry) : flightStorage;
-       flightStorage = minPrice != null && maxPrice != null && classType != null ?
-           FilterFlightInPriceRange(flightStorage, (int)minPrice, (int) maxPrice, (Classes)classType) : flightStorage;
-       foreach (var flight in flightStorage)
-       {
-           yield return flight.Value;
-       }
-   }
+ 
 }

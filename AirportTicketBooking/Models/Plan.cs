@@ -1,8 +1,8 @@
 ﻿using AirportTicketBooking.Interfaces;
 
-namespace AirportTicketBooking.Details;
+namespace AirportTicketBooking.Models;
 
-public class PlanDetails : IIndexed
+public class Plan : IIndexed
 {
     public int Id { get; init; }
     public string Name { get; set; }
@@ -93,7 +93,7 @@ public class PlanDetails : IIndexed
         } 
     }
     
-    public PlanDetails(int id,string name,Tuple<int, int> economy, Tuple<int, int> business, Tuple<int, int> firstClass)
+    public Plan(int id,string name,Tuple<int, int> economy, Tuple<int, int> business, Tuple<int, int> firstClass)
     {
         Id = id;
         Name = name;
@@ -105,7 +105,7 @@ public class PlanDetails : IIndexed
         FirstClassPrice = business.Item2;
     }
 
-    public PlanDetails(int id, string name,int economyCapacity, int businessCapacity, int firstClassCapacity, int economyPrice, int businessPrice, int firstClassPrice)
+    public Plan(int id, string name,int economyCapacity, int businessCapacity, int firstClassCapacity, int economyPrice, int businessPrice, int firstClassPrice)
     {
         Id = id;
         EconomyCapacity = economyCapacity;

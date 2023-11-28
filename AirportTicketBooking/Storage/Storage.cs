@@ -3,14 +3,34 @@ using ServiceStack;
 
 namespace AirportTicketBooking.Storage;
 
-public abstract class Storage<T> : IFileReader, IFileWriter where T : IIndexed
+public abstract class Storage<T> : IFileReader, IFileWriter, IStorage where T : IIndexed
 {
     protected string _path;
-    protected string _defaultPath;
-    protected Dictionary<int,T> _dataDetailsMap;
+    protected Dictionary<int, T> _dataDetailsMap = new();
+    protected int IdGenerator { get; set; }
     public bool SaveDataBeforeClosing {
         get;
         set;
+    }
+    protected Storage(string path)
+    {
+        _path = path;
+    }
+    public int GetCurrentId()
+    {
+        return IdGenerator++;
+    }
+    private void SetGenerator()
+    {
+        try
+        {
+            var detailsList = _dataDetailsMap.Values.ToList();
+            IdGenerator = detailsList[^1].Id + 1;
+        }
+        catch (Exception e)
+        {
+            IdGenerator = 0;
+        }    
     }
     public void AddData(T dataDetails)
     {
@@ -28,20 +48,19 @@ public abstract class Storage<T> : IFileReader, IFileWriter where T : IIndexed
     {
         if (!File.Exists(_path))
         {
-            _path = _defaultPath;
+            throw new Exception("Error: Path does not exist");
         }
-        List<T> dataDetails = _dataDetailsMap.Values.ToList();
+        var dataDetails = _dataDetailsMap.Values.ToList();
         File.WriteAllText(_path,dataDetails.ToCsv());
     }
-    protected abstract void SetGenerator(List<T> detailsList);
     public void ReadFile()
     {
         if (File.Exists(_path))
         {
             _dataDetailsMap.Clear();
-            string data = File.ReadAllText(_path);
-            List<T> detailsList = data.FromCsv<List<T>>();
-            SetGenerator(detailsList);
+            var data = File.ReadAllText(_path);
+            var detailsList = data.FromCsv<List<T>>();
+            SetGenerator();
             _dataDetailsMap = detailsList.Select(flight => new { flight.Id, flight = flight }).ToDictionary(x => x.Id,x=> x.flight);
             return;
         }
@@ -50,7 +69,7 @@ public abstract class Storage<T> : IFileReader, IFileWriter where T : IIndexed
     
     public override string ToString()
     {
-        string data ="****************************";
+        var data ="****************************";
         foreach (var details in _dataDetailsMap)
         {
             data += $"""

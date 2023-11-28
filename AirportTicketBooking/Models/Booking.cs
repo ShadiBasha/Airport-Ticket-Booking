@@ -2,15 +2,15 @@
 using AirportTicketBooking.Interfaces;
 using AirportTicketBooking.Storage;
 
-namespace AirportTicketBooking.Details;
+namespace AirportTicketBooking.Models;
 
-public class BookingDetails : IIndexed
+public class Booking : IIndexed
 {
     public int Id { get; init; }
     public int FlightId { get; init; }
     public int UserId { get; init; }
     public Classes ClassType { get; init; }
-    public BookingDetails(int id, int flightId, int userId, Classes classType)
+    public Booking(int id, int flightId, int userId, Classes classType)
     {
         Id = id;
         FlightId = flightId;
@@ -20,15 +20,15 @@ public class BookingDetails : IIndexed
 
     public override string ToString()
     {
-        UserStorage userStorage = UserStorage.GetStorageInstance();
-        FlightStorage flightStorage = FlightStorage.GetStorageInstance();
+        var userStorage = StorageFactory.GetStorage(StorageType.User) as UserStorage;
+        var flightStorage = StorageFactory.GetStorage(StorageType.Flight) as FlightStorage;
         return $"""
                ****************************
                Booked flight for user {UserId} 
-               Username  : {userStorage.FindUser(UserId)?.Name}
+               Username  : {userStorage?.FindUser(UserId)?.Name}
                User Class: {ClassType}
                Booking ID : {Id}
-               {flightStorage.FindFlight(FlightId)}
+               {flightStorage?.FindFlight(FlightId)}
                ****************************
                """;
     }

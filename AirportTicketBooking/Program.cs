@@ -3,21 +3,22 @@ using ServiceStack;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Channels;
-using AirportTicketBooking.Details;
 using AirportTicketBooking.Enum;
 using AirportTicketBooking.Filter;
+using AirportTicketBooking.Models;
+using AirportTicketBooking.Services;
 using AirportTicketBooking.Storage;
 
 namespace AirportTicketBooking;
 
 class Program
 {
-        private static readonly PlanStorage PlanStorageInstance = PlanStorage.GetStorageInstance();
-        private static readonly FlightStorage FlightStorageInstance = FlightStorage.GetStorageInstance();
-        private static readonly AirportStorage AirportStorageInstance = AirportStorage.GetStorageInstance();
-        private static readonly BookingStorage BookingStorageInstance = BookingStorage.GetStorageInstance();
-        private static readonly UserStorage UserStorageInstance = UserStorage.GetStorageInstance();
-        private static UserDetails? _currentUser;
+        private static readonly PlanStorage PlanStorageInstance = (StorageFactory.GetStorage(StorageType.Plan, "PlanData.csv") as PlanStorage)!;
+        private static readonly FlightStorage FlightStorageInstance = (StorageFactory.GetStorage(StorageType.Flight, "FlightData.csv") as FlightStorage)!;
+        private static readonly AirportStorage AirportStorageInstance = (StorageFactory.GetStorage(StorageType.Airport, "AirportData.csv") as AirportStorage)!;
+        private static readonly BookingStorage BookingStorageInstance = (StorageFactory.GetStorage(StorageType.Booking, "BookingData.csv") as BookingStorage)!;
+        private static readonly UserStorage UserStorageInstance = (StorageFactory.GetStorage(StorageType.User, "UserData.csv") as UserStorage)!;
+        private static User? _currentUser;
     static void InitiateStorage()
     {
         PlanStorageInstance.ReadFile();
@@ -58,7 +59,7 @@ class Program
         int? departureAirport = null;
         int? arrivalAirport = null;
         Classes? classType = Classes.Economy;
-        Dictionary<int, FlightDetails> flightDetailsMap = FlightStorageInstance.GetData();
+        Dictionary<int, Flight> flightDetailsMap = FlightStorageInstance.GetData();
         string? command;
         Console.WriteLine(FormatData(flightDetailsMap));
         do
@@ -196,7 +197,7 @@ class Program
                 if(flightId != -1 && flightClassType != null)
                     try
                     {
-                        _currentUser?.BookAFlight(flightId, (Classes)flightClassType);
+                        BookingService.BookAFlight(flightId, (Classes)flightClassType, _currentUser);
                         Console.Clear();
                         Console.WriteLine($"""
                                           Flight was booked successfully
@@ -236,7 +237,7 @@ class Program
                 continue;
             }
 
-            foreach (var flight in FlightFilter.FilterByAll(flightDetailsMap,departureDate,departureAirport,arrivalAirport,departureCountry,destinationCountry,minPrice,maxPrice,classType)) 
+            foreach (var flight in FlightStorageInstance.FilterByAll(AirportStorageInstance,departureDate,departureAirport,arrivalAirport,departureCountry,destinationCountry,minPrice,maxPrice,classType)) 
             {
                 Console.Clear();
                 Console.WriteLine("Results : ");
@@ -305,7 +306,7 @@ class Program
 
                 try
                 {
-                    _currentUser!.ModifyBooking(bookingID,(Classes)newClassType);
+                    BookingService.ModifyBooking(bookingID,(Classes)newClassType, _currentUser);
                     UserStorageInstance.WriteInFile();
                     BookingStorageInstance.WriteInFile();
                     Console.WriteLine("Booking has been modified");
@@ -331,7 +332,7 @@ class Program
                 }
                 try
                 {
-                    _currentUser!.CancelBooking(bookingID);
+                    BookingService.CancelBooking(bookingID, _currentUser);
                     UserStorageInstance.WriteInFile();
                     BookingStorageInstance.WriteInFile();
                     Console.WriteLine("Booking has been Canceled");
@@ -564,7 +565,7 @@ class Program
                 Console.WriteLine("Invalid command. Please enter a valid option.");
                 continue;
             }
-            foreach (var booking in BookingFilter.FilterByAll(BookingStorageInstance.GetData(),FlightStorageInstance,AirportStorageInstance,flightId,minPrice,maxPrice,departureCountry,destinationCountry,departureAirport,arrivalAirport,userId,classType))
+            foreach (var booking in BookingStorageInstance.FilterByAll(FlightStorageInstance,AirportStorageInstance,flightId,minPrice,maxPrice,departureCountry,destinationCountry,departureAirport,arrivalAirport,userId,classType))
             {
                 Console.Clear();
                 Console.WriteLine("Results : ");
@@ -586,7 +587,6 @@ class Program
     }
     static void UploadFlights()
     {
-        string? command;
         do
         {
             Console.WriteLine("""
@@ -597,11 +597,11 @@ class Program
                               4 - Upload Flight
                               E - Exit
                               """);
-            command = Console.ReadLine();
+            var command = Console.ReadLine();
             if (command == "1")
             {
                 Console.Clear();
-                Type type = typeof(FlightDetails);
+                var type = typeof(Flight);
                 Console.WriteLine("--------------------------------");
                 foreach (var property in type.GetProperties())
                 {
@@ -633,7 +633,7 @@ class Program
             {
                 Console.Clear();
                 Console.WriteLine("File Path");
-                string? path = Console.ReadLine();
+                var path = Console.ReadLine();
                 if (!File.Exists(path))
                 {
                     Console.WriteLine("Error : File does not exist please check the path and try again");
@@ -666,7 +666,7 @@ class Program
                            Type the number for the command
                            Type anything else to exit.
                            """);
-        string? command = Console.ReadLine();
+        var command = Console.ReadLine();
         if (command == "1")
         {
             Console.Clear();
@@ -686,9 +686,9 @@ class Program
     static void LoggingPage()
     {
         Console.WriteLine("Username: ");
-        string? username = Console.ReadLine();
+        var username = Console.ReadLine();
         Console.WriteLine("Password: ");
-        string? password = Console.ReadLine();
+        var password = Console.ReadLine();
         if (username == string.Empty || password == string.Empty)
         {
             Console.Clear();
@@ -712,7 +712,7 @@ class Program
     static void AdminLogin()
     {
         Console.WriteLine("Password");
-        string? password = Console.ReadLine();
+        var password = Console.ReadLine();
         if (password == "123")
         {
             Console.Clear();

@@ -1,9 +1,10 @@
-﻿using AirportTicketBooking.Interfaces;
+﻿using AirportTicketBooking.Enum;
+using AirportTicketBooking.Interfaces;
 using AirportTicketBooking.Storage;
 
-namespace AirportTicketBooking.Details;
+namespace AirportTicketBooking.Models;
 
-public class FlightDetails : IIndexed
+public class Flight : IIndexed
 {
     public int Id { get; init; }
     // private List<TripDetails> _trips;
@@ -28,7 +29,7 @@ public class FlightDetails : IIndexed
     public int DepartureAirportId { get; set;}
     public int ArrivalAirportId { get; set; }
     
-    public FlightDetails(int id,DateTime takeoffTime, int planId, TimeOnly duration, int departureAirportId, int arrivalAirportId)
+    public Flight(int id,DateTime takeoffTime, int planId, TimeOnly duration, int departureAirportId, int arrivalAirportId)
     {
         Id = id;
         _takeoffTime = takeoffTime;
@@ -38,26 +39,26 @@ public class FlightDetails : IIndexed
         ArrivalAirportId = arrivalAirportId;
     }
 
-    public int[] ComputePrices()
+    public int?[] ComputePrices()
     {
-        PlanStorage planStorage = PlanStorage.GetStorageInstance();
-        planStorage.ReadFile();
-        var plan = planStorage.FindPlan(PlanId);
-        int economyPrice = plan.EconomyPrice * Duration.Hour * 2 + plan.EconomyPrice * (Duration.Minute / 30);
-        int businessPrice = plan.BusinessPrice * Duration.Hour * 2 + plan.BusinessPrice * (Duration.Minute / 30);
-        int firstClassPrice = plan.FirstClassPrice * Duration.Hour * 2 + plan.FirstClassPrice * (Duration.Minute / 30);
+        var planStorage = StorageFactory.GetStorage(StorageType.Plan) as PlanStorage;
+        planStorage?.ReadFile();
+        var plan = planStorage?.FindPlan(PlanId);
+        var economyPrice = plan?.EconomyPrice * Duration.Hour * 2 + plan?.EconomyPrice * (Duration.Minute / 30);
+        var businessPrice = plan?.BusinessPrice * Duration.Hour * 2 + plan?.BusinessPrice * (Duration.Minute / 30);
+        var firstClassPrice = plan?.FirstClassPrice * Duration.Hour * 2 + plan?.FirstClassPrice * (Duration.Minute / 30);
         return new [] {economyPrice,businessPrice,firstClassPrice};
     }
 
     public override string ToString()
     {
-        AirportStorage airportStorage = AirportStorage.GetStorageInstance();
-        var airportDetails = airportStorage.GetData();
+        var airportStorage = StorageFactory.GetStorage(StorageType.Airport) as AirportStorage;
+        var airportDetails = airportStorage?.GetData();
         var prices = ComputePrices();
         return $"""
                 Flight {Id}
                 Plan Id : {PlanId}
-                Departure Airport : {airportDetails[DepartureAirportId].Name} --> Arrival Airport : {airportDetails[ArrivalAirportId].Name}
+                Departure Airport : {airportDetails?[DepartureAirportId].Name} --> Arrival Airport : {airportDetails?[ArrivalAirportId].Name}
                 Takeoff Date : {TakeoffTime}
                 Duration : {Duration.Hour}:{Duration.Minute.ToString().PadLeft(2,'0')}
                 Price
